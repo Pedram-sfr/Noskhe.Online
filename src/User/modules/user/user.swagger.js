@@ -9,12 +9,15 @@
  * @swagger
  *  components:
  *      schemas:
- *          SendOTP:
+ *          EditUser:
  *              type: object
  *              required:
- *                  -   mobile
+ *                  -   fullName
+ *                  -   nationalCode
  *              properties:
- *                  mobile:
+ *                  fullName:
+ *                      type: string
+ *                  nationalCode:
  *                      type: string
  */
 
@@ -25,6 +28,31 @@
  *      summary: get user profile
  *      tags:
  *          -   User
+ *      parameters:
+ *          -   in: header
+ *              name: accesstoken
+ *              example: Bearer yourtoken
+ *      responses:
+ *          200:
+ *              description: success
+ *      
+ */
+/**
+ * @swagger
+ * /user/edit-profile:
+ *  post:
+ *      summary: edit user profile
+ *      tags:
+ *          -   User
+ *      parameters:
+ *          -   in: header
+ *              name: accesstoken
+ *              example: Bearer yourtoken
+ *      requestBody:
+ *          content:
+ *              application/x-www-form-urlencoded:
+ *                  schema:
+ *                      $ref: "#/components/schemas/EditUser"
  *      responses:
  *          200:
  *              description: success

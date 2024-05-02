@@ -6,6 +6,7 @@ const AuthMessages = {
     OTPCodeInCorrect: "OTPCode is incorrect",
     LoginSuccessfully: "Login Successfully",
     Logout: "logout Successfully",
+    TokenIsInvalid: "TokenIsInvalid",
 }
 module.exports = {
     AuthMessages

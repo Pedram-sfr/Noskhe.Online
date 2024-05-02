@@ -26,6 +26,26 @@
  *                      type: string
  *                  code:
  *                      type: string
+ *          RefreshToken:
+ *              type: object
+ *              required:
+ *                  -   refreshToken
+ *              properties:
+ *                  refreshToken:
+ *                      type: string
+ *          Checkarray:
+ *              type: array
+ *              in: formData
+ *              items:
+ *                  type: object
+ *              required:
+ *                  -   mobile
+ *                  -   code
+ *              properties:
+ *                  mobile:
+ *                      type: string
+ *                  code:
+ *                      type: string
  */
 
 /**
@@ -57,6 +77,40 @@
  *              application/x-www-form-urlencoded:
  *                  schema:
  *                      $ref: "#/components/schemas/CheckOTP"
+ *      responses:
+ *          200:
+ *              description: success
+ *      
+ */
+/**
+ * @swagger
+ * /user/auth/refresh-token:
+ *  post:
+ *      summary: sign refreshToken
+ *      tags:
+ *          -   Auth
+ *      requestBody:
+ *          content:
+ *              application/x-www-form-urlencoded:
+ *                  schema:
+ *                      $ref: "#/components/schemas/RefreshToken"
+ *      responses:
+ *          200:
+ *              description: success
+ *      
+ */
+/**
+ * @swagger
+ * /user/auth/check:
+ *  post:
+ *      summary: login with otp and mobile
+ *      tags:
+ *          -   Auth
+ *      requestBody:
+ *          content:
+ *              application/x-www-form-urlencoded:
+ *                  schema:
+ *                      $ref: "#/components/schemas/Checkarray"
  *      responses:
  *          200:
  *              description: success

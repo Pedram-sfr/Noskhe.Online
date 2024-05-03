@@ -10,7 +10,6 @@ class AddressService{
         this.#model = AddressModel
     } 
     async createAddressInDB(data){
-        console.log("1");
         return await this.#model.create(data);
     }
     async updateAddressInDB(_id,data){

@@ -1,33 +1,137 @@
 /**
  * @swagger
  *  tags:
- *      name: User
- *      description: User Routes
+ *      name: User-Order
+ *      description: UserOrder Routes
  */
 
 /**
  * @swagger
  *  components:
  *      schemas:
- *          Order:
+ *          CreateOrder:
  *              type: object
+ *              required:
+ *                  -   addressId
  *              properties:
- *                  list:
- *                      type: array
+ *                  addressId:
+ *                      type: string
+ *                  description:
+ *                      type: string
+ *          ElecPrescription:
+ *              type: object
+ *              required:
+ *                  -   orderId
+ *                  -   data
+ *              properties:
+ *                  orderId:
+ *                      type: string
+ *                  data:
+ *                      type: string
+ *          AddOTC:
+ *              type: object
+ *              required:
+ *                  -   orderId
+ *                  -   data
+ *                  -   image
+ *              properties:
+ *                  orderId:
+ *                      type: string
+ *                  data:
+ *                      type: string
+ *                  image:
+ *                      type: file
+ *          UploadPrescription:
+ *              type: object
+ *              required:
+ *                  -   orderId
+ *                  -   image
+ *              properties:
+ *                  orderId:
+ *                      type: string
+ *                  image:
+ *                      type: file
  */
 
 /**
  * @swagger
- * /user/order/add:
+ * /user/order/create:
  *  post:
- *      summary: edit user profile
+ *      summary: create order
  *      tags:
- *          -   User
+ *          -   User-Order
+ *      parameters:
+ *          -   in: header
+ *              name: accesstoken
+ *              example: Bearer yourtoken
  *      requestBody:
  *          content:
  *              application/x-www-form-urlencoded:
  *                  schema:
- *                      $ref: "#/components/schemas/Order"
+ *                      $ref: "#/components/schemas/CreateOrder"
+ *      responses:
+ *          200:
+ *              description: success
+ *      
+ */
+/**
+ * @swagger
+ * /user/order/addOTC:
+ *  post:
+ *      summary: add otc
+ *      tags:
+ *          -   User-Order
+ *      parameters:
+ *          -   in: header
+ *              name: accesstoken
+ *              example: Bearer yourtoken
+ *      requestBody:
+ *          content:
+ *              multipart/form-data:
+ *                  schema:
+ *                      $ref: "#/components/schemas/AddOTC"
+ *      responses:
+ *          200:
+ *              description: success
+ *      
+ */
+/**
+ * @swagger
+ * /user/order/uploadPrescription:
+ *  post:
+ *      summary: add UploadPrescription
+ *      tags:
+ *          -   User-Order
+ *      parameters:
+ *          -   in: header
+ *              name: accesstoken
+ *              example: Bearer yourtoken
+ *      requestBody:
+ *          content:
+ *              multipart/form-data:
+ *                  schema:
+ *                      $ref: "#/components/schemas/UploadPrescription"
+ *      responses:
+ *          200:
+ *              description: success
+ *      
+ */
+/**
+ * @swagger
+ * /user/order/elecPrescription:
+ *  post:
+ *      summary: add elecPrescription
+ *      tags:
+ *          -   User-Order
+ *      parameters:
+ *          -   in: header
+ *              name: accesstoken
+ *              example: Bearer yourtoken
+ *      requestBody:
+ *          content:
+ *              application/x-www-form-urlencoded:
+ *                  schema:
+ *                      $ref: "#/components/schemas/ElecPrescription"
  *      responses:
  *          200:
  *              description: success

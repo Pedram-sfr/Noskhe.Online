@@ -10,10 +10,10 @@ const Authorization = async (req,res,next)=>{
         if(token && ["bearer","Bearer"].includes(bearer)){
             jwt.verify(token,process.env.JWT_SECRET_KEY,async (err,payload)=>{
                 if(err) return next(createHttpError.Unauthorized(AuthMessages.TokenIsInvalid))
-                const {mobile} = payload;
+                const {mobile,userId} = payload;
                 const user = await UserModel.findOne({mobile}, {accessToken: 0, otp: 0, updatedAt: 0,createdAt: 0, verfiedMobile: 0,_id: 0}).lean();
                 if(!user) throw new createHttpError.Unauthorized(AuthMessages.NotFoundUser);
-                req.user =user;
+                req.user ={mobile,userId};
                 return next();
             })
         }

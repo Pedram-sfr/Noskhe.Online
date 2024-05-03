@@ -37,8 +37,8 @@ class AuthService{
         if(!user.verfiedMobile){
             user.verfiedMobile = true;
         }
-        const accessToken = this.signAccessToken({mobile});
-        const refreshToken = this.signRefreshToken({mobile});
+        const accessToken = this.signAccessToken({mobile,userId: user._id});
+        const refreshToken = this.signRefreshToken({mobile,userId: user._id});
         await user.save();
         return {accessToken , refreshToken};
     }
@@ -63,10 +63,10 @@ class AuthService{
         return new Promise((resolve,reject) => {
             jwt.verify(token,process.env.JWT_REFRESHSECRET_KEY,async (err,payload)=>{
                 if(err) return reject(createHttpError.Unauthorized(AuthMessages.TokenIsInvalid))
-                const {mobile} = payload || {};
+                const {mobile,userId} = payload || {};
                 const user = await UserModel.findOne({mobile}, {accessToken: 0, otp: 0, updatedAt: 0,createdAt: 0, verfiedMobile: 0,_id: 0}).lean();
                 if(!user) throw new createHttpError.Unauthorized(AuthMessages.NotFound);
-                resolve(mobile)
+                resolve({mobile,userId})
             })
         })
 

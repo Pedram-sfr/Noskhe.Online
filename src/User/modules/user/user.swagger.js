@@ -40,7 +40,7 @@
 /**
  * @swagger
  * /user/edit-profile:
- *  post:
+ *  patch:
  *      summary: edit user profile
  *      tags:
  *          -   User

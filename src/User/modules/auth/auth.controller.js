@@ -32,10 +32,7 @@ class AuthController{
             await checkOTPSchema.validateAsync(req.body)
             const {mobile,code} = req.body;
             const token = await this.#service.checkOTP(mobile,code)
-            return res.cookie(CookieName.AccessToken,token,{
-                httpOnly: true,
-                secure: process.env.NODE_ENV === NodeEnv.Development
-            }).status(200).json({
+            return res.status(200).json({
                 statusCode: 200,
                 data: {
                     message: AuthMessages.LoginSuccessfully,
@@ -50,8 +47,9 @@ class AuthController{
     async refreshToken(req,res,next){
         try {
             const {refreshToken} = req.body;
-            const mobile = await this.#service.verifyRefreshToken(refreshToken);
-            const token = await this.#service.signToken({mobile});
+            const {mobile,userId} = await this.#service.verifyRefreshToken(refreshToken);
+            console.log({mobile,userId});
+            const token = await this.#service.signToken({mobile,userId});
             return res.status(200).json({
                 statusCode: 200,
                 data: {

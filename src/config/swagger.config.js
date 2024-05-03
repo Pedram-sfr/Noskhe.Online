@@ -15,7 +15,7 @@ function swaggerConfig(app) {
         apis: [process.cwd() + "/src/**/*.swagger.js"]
     })  
     const swagger = swaggerUi.setup(swaggerDocument,{customCssUrl: CSS_URL});
-    app.use("/swagger-doc",express.static('node_modules/swagger-ui-dist'),swaggerUi.serve,swagger);
+    app.use("/swagger-doc",swaggerUi.serve,swagger);
 }
 
 module.exports = swaggerConfig

@@ -15,6 +15,9 @@ async function main(){
     app.get('/home', (req, res) => {
         res.status(200).json('Welcome, your app is working well');
       })
+    const pathToSwaggerUi = require('swagger-ui-dist').absolutePath()
+    app.use(express.static(pathToSwaggerUi))
+
     app.use(express.static("public"));
     swaggerConfig(app);
     app.use(userRouter)

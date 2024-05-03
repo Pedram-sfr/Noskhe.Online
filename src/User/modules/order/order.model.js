@@ -42,7 +42,8 @@ UploadPrescriptionSchema.virtual("imageUrl").get(function(){
 })
 const OrderSchema = new Schema({
     userId : {type: Types.ObjectId, ref: "user", required: true},
-    mobile: {type: String,required: true},
+    mobile: {type: String,required: false},
+    fullName: {type: String,required: false},
     pharmId : {type: Types.ObjectId, required: false},
     addressId : {type: Types.ObjectId,ref: "address", required: true},
     description: {type: String, required: false},

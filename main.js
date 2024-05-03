@@ -12,7 +12,10 @@ async function main(){
     require("./src/config/mongoose.config");
     app.use(express.json());
     app.use(express.urlencoded({extended: true}));
-    app.use(cookieParser(process.env.COOKIE_SECRET_KEY))
+    app.get('/home', (req, res) => {
+        res.status(200).json('Welcome, your app is working well');
+      })
+    app.use(express.static("public"));
     swaggerConfig(app);
     app.use(userRouter)
     AllExceptionHandler(app);

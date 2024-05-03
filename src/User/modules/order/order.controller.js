@@ -3,19 +3,44 @@ const path = require("path")
 const autoBind = require("auto-bind");
 const createHttpError = require("http-errors");
 const UserModel = require("../user/user.model");
-const { deleteFileInPublic } = require("../../../common/function/function");
+const { deleteFileInPublic, isFalse } = require("../../../common/function/function");
 const { log } = require("console");
+const OrderModel = require("./order.model");
 class OrderController{
     #service
     constructor(){
         autoBind(this);
         this.#service = OrderService
     }
+    async OrderList(req,res,next){
+        try {
+            const {userId} = req.user;
+            const {orderId} = req.params;
+            const order = await OrderModel.findOne({_id: orderId,userId})
+            if(!order) throw createHttpError.NotFound("بافت نشد")
+            return res.status(200).json({
+                statusCode: 200,
+                data: {
+                    order
+                },
+                error: null
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
     async createOrder(req,res,next){
         try {
-            const {mobile,userId} = req.user;
-            const {description, addressId} = req.body;
-            const resualt = await this.#service.createOrder({userId,mobile,description, addressId,status: "در انتظار تایید داروخانه"})
+            const {userId} = req.user;
+            const {description, addressId,mobile,fullName,myself} = req.body;
+            let resualt;
+            if(isFalse(myself)){
+                resualt=await this.#service.createOrder({userId,mobile,description, addressId,status: 0,fullName})
+            }else{
+                const user = await UserModel.findById({_id: userId});
+                if(!user) throw createHttpError.NotFound("کاربر یافت نشد")
+                resualt=await this.#service.createOrder({userId,mobile:user.mobile,description, addressId,status: 0,fullName:user.fullName})
+            }
             return res.status(200).json({
                 statusCode: 200,
                 data: {
@@ -33,6 +58,34 @@ class OrderController{
             const {userId} = req.user;
             req.body.image = (path.join(ordOTC.fileUploadPath,ordOTC.filename)).replace(/\\/gi,"/");
             const {orderId,data} = ordOTC
+            const image = req.body.image;
+            const dataobj = JSON.parse(data)
+            dataobj.image = image
+            await this.#service.addOTC(orderId,userId,dataobj)
+            return res.status(200).json({
+                statusCode: 200,
+                data: {
+                    message: "افزوده شد"
+                },
+                error: null
+            })
+        } catch (error) {
+            deleteFileInPublic(req.body.image)
+            next(error)
+        }
+    }
+    async editOTC(req,res,next){
+        try {
+            const {otcId,orderId} = req.body;
+            const {userId} = req.user;
+            const {filename,fileUploadPath} = req.body
+            const data = OrderModel.findOne({"otc._id": otcId})
+            return console.log(data);
+            if(req.file){
+                deleteFileInPublic(course.image)
+                data.image = path.join(fileUploadPath,filename).replace(/\\/g,"/");
+            }
+            req.body.image = (path.join(ordOTC.fileUploadPath,ordOTC.filename)).replace(/\\/gi,"/");
             const image = req.body.image;
             const dataobj = JSON.parse(data)
             dataobj.image = image

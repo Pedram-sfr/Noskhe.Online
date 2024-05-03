@@ -7,7 +7,7 @@ function createroute(req){
     const year = date.getFullYear().toString();
     const month = date.getMonth().toString();
     const day = date.getDay().toString();
-    const directory = path.join(__dirname,"..","..","public","uploads",((req.baseUrl).split("/")[2]).toString(),year,month,day);
+    const directory = path.join(__dirname,"..","..","..","public","uploads",((req.baseUrl).split("/")[2]).toString(),year,month,day);
     req.body.fileUploadPath = path.join("uploads",((req.baseUrl).split("/")[2]).toString(),year,month,day);
     fs.mkdirSync(directory,{recursive:true});
     return directory

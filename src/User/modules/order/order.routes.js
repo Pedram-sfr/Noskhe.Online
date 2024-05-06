@@ -12,6 +12,7 @@ router.get("/list/:orderId",Authorization,orderController.OrderList)
 router.post("/uploadPrescription",Authorization,uploadFile.single("image"),orderController.addUploadPrescription)
 router.post("/elecPrescription",Authorization,orderController.addElecPrescription)
 router.post("/create",Authorization,orderController.createOrder)
+router.post("/OrderToPharmacy",orderController.addOrderToPharmacy)
 module.exports = {
     OrderRouter: router
 }

@@ -3,8 +3,7 @@ const dotenv = require("dotenv");
 const swaggerConfig = require("./src/config/swagger.config");
 const AllExceptionHandler = require("./src/common/exception/all-exception.handler");
 const NotFoundHandler = require("./src/common/exception/not-found.handler");
-const cookieParser = require("cookie-parser");
-const userRouter = require("./src/User/app.routes");
+const AllRouter = require("./src/app.routes");
 dotenv.config();
 async function main(){
     const app = express();
@@ -17,7 +16,7 @@ async function main(){
       })
     app.use(express.static("public"));
     swaggerConfig(app);
-    app.use(userRouter)
+    app.use(AllRouter)
     AllExceptionHandler(app);
     NotFoundHandler(app)
     app.listen(port, ()=>{

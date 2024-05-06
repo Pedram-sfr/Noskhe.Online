@@ -6,6 +6,7 @@ const UserModel = require("../user/user.model");
 const { deleteFileInPublic, isFalse } = require("../../../common/function/function");
 const { log } = require("console");
 const OrderModel = require("./order.model");
+const PharmacyOrderModel = require("./pharmacyOrder.model");
 class OrderController{
     #service
     constructor(){
@@ -80,7 +81,6 @@ class OrderController{
             const {userId} = req.user;
             const {filename,fileUploadPath} = req.body
             const data = OrderModel.findOne({"otc._id": otcId})
-            return console.log(data);
             if(req.file){
                 deleteFileInPublic(course.image)
                 data.image = path.join(fileUploadPath,filename).replace(/\\/g,"/");
@@ -129,6 +129,38 @@ class OrderController{
             const {orderId,data} = req.body;
             const {userId} = req.user;
             await this.#service.addElecPrescription(orderId,userId,JSON.parse(data))
+            return res.status(200).json({
+                statusCode: 200,
+                data: {
+                    message: "افزوده شد"
+                },
+                error: null
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+    async addElecPrescription(req,res,next){
+        try {
+            const {orderId,data} = req.body;
+            const {userId} = req.user;
+            await this.#service.addElecPrescription(orderId,userId,JSON.parse(data))
+            return res.status(200).json({
+                statusCode: 200,
+                data: {
+                    message: "افزوده شد"
+                },
+                error: null
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+    async addOrderToPharmacy(req,res,next){
+        try {
+            const {orderId,pharmacyId} = req.body;
+            const resualt = await PharmacyOrderModel.create({orderId,pharmacyId});
+            if(!resualt) throw createHttpError.InternalServerError("خطای سرور")
             return res.status(200).json({
                 statusCode: 200,
                 data: {

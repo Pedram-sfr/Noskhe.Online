@@ -9,8 +9,15 @@ function deleteFileInPublic(fileAddress) {
       if (fs.existsSync(pathFile)) fs.unlinkSync(pathFile);
     }
   }
+function deleteNulishObject(data) {
+  let nullishData = ["", " ", "0", 0, null, undefined];
+  Object.keys(data).forEach((key) => {
+      if (nullishData.includes(data[key])) delete data[key];
+  });
+}
 module.exports ={
     isTrue,
     isFalse,
-    deleteFileInPublic
+    deleteFileInPublic,
+    deleteNulishObject
 }

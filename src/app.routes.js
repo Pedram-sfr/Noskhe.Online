@@ -5,6 +5,7 @@ const { OrderRouter } = require("./User/modules/order/order.routes");
 const { AddressRouter } = require("./User/modules/address/address.routes");
 const { PharmacyAuthRouter } = require("./Pharmacy/modules/auth/pharmacyAuth.routes");
 const { PharmacyUserRouter } = require("./Pharmacy/modules/user/pharmacyUser.routes");
+const { DrugRouter } = require("./Pharmacy/modules/drug/drug.routes");
 
 const AllRouter = Router();
 
@@ -15,6 +16,7 @@ AllRouter.use("/user/address",AddressRouter);
 
 AllRouter.use("/pharmacy/auth",PharmacyAuthRouter);
 AllRouter.use("/pharmacy",PharmacyUserRouter);
+AllRouter.use("/pharmacy/drug",DrugRouter);
 
 
 module.exports = AllRouter;

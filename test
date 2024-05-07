@@ -1,0 +1,45 @@
+[
+  'A1:E2',
+  {
+    t: 's',
+    v: 'test name',
+    r: '<t>test name</t>',
+    h: 'test name',
+    w: 'test name'
+  },
+  {
+    t: 's',
+    v: 'type test',
+    r: '<t>type test</t>',
+    h: 'type test',
+    w: 'type test'
+  },
+  { t: 'n', v: 250000, w: '250000' },
+  { t: 'n', v: 20000, w: '20000' },
+  { t: 'n', v: 0, w: '0' },
+  {
+    t: 's',
+    v: 'test name1',
+    r: '<t>test name1</t>',
+    h: 'test name1',
+    w: 'test name1'
+  },
+  {
+    t: 's',
+    v: 'type test1',
+    r: '<t>type test1</t>',
+    h: 'type test1',
+    w: 'type test1'
+  },
+  { t: 'n', v: 300000, w: '300000' },
+  { t: 'n', v: 200030, w: '200030' },
+  { t: 'n', v: 5, w: '5' },
+  {
+    left: 0.7,
+    right: 0.7,
+    top: 0.75,
+    bottom: 0.75,
+    header: 0.3,
+    footer: 0.3
+  }
+]

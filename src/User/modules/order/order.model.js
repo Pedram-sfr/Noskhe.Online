@@ -6,7 +6,6 @@ const OTCSchema = new Schema({
     image: {type: String, required: true},
     drugName: {type: String, required: true},
 },{
-    timestamps: true,
     versionKey: false,
     toJSON:{
         virtuals: true
@@ -19,7 +18,6 @@ const ElecPrescriptionSchema = new Schema({
     doctorName: {type: String,required: true},
     trackingCode: {type: String, required: true},
 },{
-    timestamps: true,
     versionKey: false,
     toJSON:{
         virtuals: true
@@ -28,7 +26,6 @@ const ElecPrescriptionSchema = new Schema({
 const UploadPrescriptionSchema = new Schema({
     image: {type: String, required: true},
 },{
-    timestamps: true,
     versionKey: false,
     toJSON:{
         virtuals: true
@@ -44,14 +41,17 @@ const OrderSchema = new Schema({
     userId : {type: Types.ObjectId, ref: "user", required: true},
     mobile: {type: String,required: false},
     fullName: {type: String,required: false},
-    pharmId : {type: Types.ObjectId, required: false},
+    pharmId : {type: Types.ObjectId, required: false,ref: "pharmacyUser"},
     addressId : {type: Types.ObjectId,ref: "address", required: true},
     description: {type: String, required: false},
     status: {type: String, required: false},
     otc: {type: [OTCSchema],required: false},
     uploadPrescription: {type: [UploadPrescriptionSchema],required: false},
     elecPrescription: {type: [ElecPrescriptionSchema],required: false},
-},{timestamps: true,versionKey:0})
+    accepted: {type: Boolean, required: true,default: false}
+},{timestamps: true,versionKey:0,toJSON:{
+    virtuals: true
+}})
 
 const OrderModel = model("order",OrderSchema);
 module.exports = OrderModel

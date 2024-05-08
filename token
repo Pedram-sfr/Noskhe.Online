@@ -1,8 +1,13 @@
-{ "token": {
-  "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6InBkcm1zZnIiLCJ1c2VySWQiOiI2NjM4YzFmZjk5YmYwMjU1ZDI5NTU5NjkiLCJpYXQiOjE3MTUxMDU0NTMsImV4cCI6MTcxNTE5MTg1M30.dJz9ap9_MBQdW7dLsUIJiY37V-pmNfydp1QknQ83Kww",
-  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6InBkcm1zZnIiLCJ1c2VySWQiOiI2NjM4YzFmZjk5YmYwMjU1ZDI5NTU5NjkiLCJpYXQiOjE3MTUxMDU0NTMsImV4cCI6MTcxNTE5MTg1M30.nW9A5PstyDzSW7p4SWyNWtKqN8p58tnztnFxNWezi0c"
+{ 
+  "token":  {
+      "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6InBkcm1zZnIiLCJ1c2VySWQiOiI2NjM4YzFmZjk5YmYwMjU1ZDI5NTU5NjkiLCJpYXQiOjE3MTUxOTM0MTgsImV4cCI6MTcxNTI3OTgxOH0.KqRXjT8k705v2QM7jeNUOEMOf9Iqb7qAD_Nn9t_FKV4",
+      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6InBkcm1zZnIiLCJ1c2VySWQiOiI2NjM4YzFmZjk5YmYwMjU1ZDI5NTU5NjkiLCJpYXQiOjE3MTUxOTM0MTgsImV4cCI6MTcxNTI3OTgxOH0.gn-FyUtYF1PhkraF5wF8CTgrh5byCqRV7RWjv5prvj4"
+    },
+  "usertoken":{
+    "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtb2JpbGUiOiIwOTEyNTA2NTIzMiIsInVzZXJJZCI6IjY2MzJiMTFjYWVhYTY3YzA2MWE4ZTQxYyIsImlhdCI6MTcxNTAwNDE5MSwiZXhwIjoxNzE1MDkwNTkxfQ.k6_6OEP6ZZOosL-8qfmuSIK7Ok542nX_K9CcRoYreXo",
+    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtb2JpbGUiOiIwOTEyNTA2NTIzMiIsInVzZXJJZCI6IjY2MzJiMTFjYWVhYTY3YzA2MWE4ZTQxYyIsImlhdCI6MTcxNTAwNDE5MSwiZXhwIjoxNzE1MDkwNTkxfQ.CWFVKzF8kRO0c3qPVxwGEh8AidNwdLxDHtnN21a4FJQ"
+  },
+  "example drugs":{
+    [{"drugName": "استامینوفن","drugType": "قرص-دانه","price": 10000,"insurance": 0,"patient": 10000,"count": 2,"total": 20000},{"drugName": "سرماخوردگی بزرگسالان","drugType": "قرص-ورق","price": 25000,"insurance": 5000,"patient": 20000,"count": 5,"total": 100000}]
+  }
 }
- {
-  "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtb2JpbGUiOiIwOTEyNTA2NTIzMiIsInVzZXJJZCI6IjY2MzJiMTFjYWVhYTY3YzA2MWE4ZTQxYyIsImlhdCI6MTcxNTAwNDE5MSwiZXhwIjoxNzE1MDkwNTkxfQ.k6_6OEP6ZZOosL-8qfmuSIK7Ok542nX_K9CcRoYreXo",
-  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtb2JpbGUiOiIwOTEyNTA2NTIzMiIsInVzZXJJZCI6IjY2MzJiMTFjYWVhYTY3YzA2MWE4ZTQxYyIsImlhdCI6MTcxNTAwNDE5MSwiZXhwIjoxNzE1MDkwNTkxfQ.CWFVKzF8kRO0c3qPVxwGEh8AidNwdLxDHtnN21a4FJQ"
-}}

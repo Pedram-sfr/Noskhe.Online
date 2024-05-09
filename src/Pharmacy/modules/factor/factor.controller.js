@@ -1,11 +1,8 @@
 const FactorService = require("./factor.service")
 const autoBind = require("auto-bind");
 const puppeteer = require("puppeteer");
-const fs = require("fs")
 const createHttpError = require("http-errors");
-const { stringToObject } = require("../../../common/function/stringToObject");
-const FactorModel = require("./factor.model");
-const { render } = require("ejs");
+const { dateToJalali, createPdf } = require("../../../common/function/function");
 class FactorController{
     #service
     constructor(){
@@ -69,8 +66,14 @@ class FactorController{
     async pdf(req,res,next){
         try {
             const {id} = req.params
-            console.log(id);
-            res.render("invoice.ejs")
+            const data = await this.#service.findFactorForPrint(id);
+            const factor = data[0]
+            const {date, time} = dateToJalali(factor.createdAt)
+            factor.time = time
+            factor.date = date
+            //createPdf(factor)
+            return res.render("invoice.ejs",{factor})
+
         } catch (error) {
             next(error)
         }

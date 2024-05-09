@@ -46,7 +46,57 @@ class FactorService{
         if(!res) throw createHttpError.InternalServerError("خطای سرور")
         return res
     } 
-
+    async findFactorForPrint(factorId){
+        const fc = await this.#model.findById(factorId)
+        if(!fc) throw createHttpError.NotFound("یافت نشد")
+        const factor = await this.#model.aggregate([
+            {$match: {_id: new Types.ObjectId(factorId)}},
+            {$lookup: {
+                from: "pharmacyusers",
+                foreignField: "_id",
+                localField: "pharmacyId",
+                as: "pharmacy"
+            }},
+            {$lookup: {
+                from: "orders",
+                foreignField: "_id",
+                localField: "orderId",
+                as: "order"
+            }},
+            {
+                $unwind: {
+                    path: "$pharmacy",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $unwind: {
+                    path: "$order",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $addFields: {
+                    pharmacyName: "$pharmacy.pharmacyName",
+                    elecPrescription: "$order.elecPrescription"
+                }
+            },
+            {
+                $project:{
+                    pharmacy: 0 ,
+                    shippingCost: 0,
+                    sendStatus:0,
+                    order: 0,
+                    orderId: 0,
+                    pharmacyId: 0,
+                    updatedAt: 0,
+                    userId: 0,
+                    addressId: 0
+                }
+            }]
+        )
+        return factor;
+    }
 
 }
 

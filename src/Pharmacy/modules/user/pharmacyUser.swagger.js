@@ -12,6 +12,8 @@
  *          PharmacyEditUser:
  *              type: object
  *              properties:
+ *                  pharmacyName:
+ *                      type: string
  *                  fullName:
  *                      type: string
  *                  nationalCode:

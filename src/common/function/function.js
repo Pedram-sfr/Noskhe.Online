@@ -1,5 +1,8 @@
 const fs = require("fs");
+const moment = require("jalali-moment");
 const path = require("path")
+const ejs = require("ejs");
+const puppeteer = require("puppeteer");
 
 const isTrue = (value) => ["true",1,true].includes(value);
 const isFalse = (value) => ["false",0,false].includes(value);
@@ -35,10 +38,40 @@ function excelToArray(excel) {
 
   return data
 }
+function dateToJalali(data) {
+  const d = data.toString().split("T")[0].split(" ")
+  const date = moment(`${d[1]}-${d[2]}-${d[3]}`,'MMM-DD-YYYY').locale('fa').format('YYYY/MM/DD');
+  const time = d[4]
+  return {date,time}
+}
+
+function createPdf(factor) {
+  const templateFile = path.resolve(__dirname, "../../../views/invoice.ejs");
+  ejs.renderFile(templateFile, {factor}, async function (err, html) {
+    if (err) {
+      console.log(err);
+    }
+
+    const browser = await puppeteer.launch({
+      headless: true,
+    });
+    const page = await browser.newPage();
+    await page.setContent(html);
+    const date = new Date().getTime();
+    await page.pdf({
+      path: `./public/factor/${date}.pdf`,
+      width: "8cm",
+      height: undefined
+    });
+    await browser.close();
+  });
+}
 module.exports ={
     isTrue,
     isFalse,
     deleteFileInPublic,
     deleteNulishObject,
     excelToArray,
+    dateToJalali,
+    createPdf
 }

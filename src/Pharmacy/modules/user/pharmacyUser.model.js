@@ -1,6 +1,7 @@
 const { Schema, model } = require("mongoose");
 
 const PharmacyUserSchema = new Schema({
+    pharmacyName: {type: String,required: false},
     fullName: {type: String,required: false},
     nationalCode: {type: String,required: false},
     licenseNumber : {type: String, required: false},

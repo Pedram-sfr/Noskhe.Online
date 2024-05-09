@@ -70,7 +70,7 @@ class FactorController{
         try {
             const {id} = req.params
             console.log(id);
-            res.render("./pages/invoice.ejs")
+            res.render("pages/invoice.ejs")
         } catch (error) {
             next(error)
         }

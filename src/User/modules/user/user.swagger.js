@@ -58,3 +58,38 @@
  *              description: success
  *      
  */
+
+/**
+ * @swagger
+ * /user/document/invoice:
+ *  get:
+ *      summary: get user invoice list
+ *      tags:
+ *          -   User
+ *      parameters:
+ *          -   in: header
+ *              name: accesstoken
+ *              example: Bearer yourtoken
+ *      responses:
+ *          200:
+ *              description: success
+ *      
+ */
+/**
+ * @swagger
+ * /user/document/invoice/{id}:
+ *  get:
+ *      summary: get user invoice list
+ *      tags:
+ *          -   User
+ *      parameters:
+ *          -   in: header
+ *              name: accesstoken
+ *              example: Bearer yourtoken
+ *          -   in: path
+ *              name: id
+ *      responses:
+ *          200:
+ *              description: success
+ *      
+ */

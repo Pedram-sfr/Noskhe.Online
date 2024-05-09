@@ -21,6 +21,7 @@ const FactorSchema = new Schema({
     paymentCode: {type: Types.ObjectId,required: false},
     paymentStatus: {type: Boolean,required: true,default: false},
     sendStatus: {type: Boolean,required: true,default: false},
+    status: {type: Boolean,required: true,default: true},
     drugs: {type: [DrugSchema],required: true},
 },{timestamps: true,
     versionKey:0,

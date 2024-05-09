@@ -2,18 +2,75 @@ const autoBind = require("auto-bind");
 const UserModel = require("./user.model");
 const createHttpError = require("http-errors");
 const { UserMessages } = require("./user.messages");
+const FactorModel = require("../../../Pharmacy/modules/factor/factor.model");
+const { Types } = require("mongoose");
+const { dateToJalali } = require("../../../common/function/function");
 
 class UserService{
     #model;
+    #factorModel;
     constructor(){
         autoBind(this);
-        this.#model = UserModel
+        this.#model = UserModel;
+        this.#factorModel = FactorModel;
     }
     
     async findUser(mobile){
         const user = await this.#model.findOne({mobile},{_id: 0,otp: 0,verfiedMobile:0,createdAt: 0,updatedAt:0,});
         if(!user) throw createHttpError.NotFound(UserMessages.NotFound)
         return user
+    } 
+    async invoiceListForUser(userId){
+        const list = await this.#factorModel.aggregate([
+            {$match: {userId: new Types.ObjectId(userId)}},
+            {
+                $project:{
+                    orderId: 0,
+                    pharmacyId: 0,
+                    updatedAt: 0,
+                    userId: 0,
+                    addressId: 0,
+                    drugs: 0
+                }
+            }]
+        )
+        if(!list) throw createHttpError.NotFound("یافت نشد")
+        return list
+    } 
+    async invoiceForUser(id,userId){
+        const list = await this.#factorModel.aggregate([
+            {$match: {_id: new Types.ObjectId(id), userId: new Types.ObjectId(userId)}},
+            {$lookup: {
+                from: "addresses",
+                foreignField: "_id",
+                localField: "addressId",
+                as: "address"
+            }},
+            {
+                $unwind: {
+                    path: "$address",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $addFields: {
+                    addressPostal: "$address.address",
+                }
+            },
+            {
+                $project:{
+                    address: 0 ,
+                    orderId: 0,
+                    pharmacyId: 0,
+                    updatedAt: 0,
+                    userId: 0,
+                    addressId: 0,
+                    "drugs._id": 0
+                }
+            }]
+        )
+        if(!list) throw createHttpError.NotFound("یافت نشد")
+        return list
     } 
     async updateUser(mobile,data){
         const updateuserResualt = await UserModel.updateOne({mobile},{

@@ -2,6 +2,7 @@ const { model, default: mongoose } = require("mongoose");
 const UserService = require("./user.service")
 const autoBind = require("auto-bind");
 const createHttpError = require("http-errors");
+const { dateToJalali } = require("../../../common/function/function");
 class UserController{
     #service
     constructor(){
@@ -34,6 +35,47 @@ class UserController{
                 statusCode: 200,
                 data: {
                     message: "بروزرسانی با موفقیت انجام شد"
+                },
+                error: null
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+    async invoiceList(req,res,next){
+        try {
+            const {userId} = req.user
+            const list = await this.#service.invoiceListForUser(userId)
+            for (let i = 0; i < list.length; i++) {
+                const {date,time} = dateToJalali(list[i].createdAt)
+                list[i].date = date;
+                list[i].time = time;
+            }
+            return res.status(200).json({
+                statusCode: 200,
+                data: {
+                    list
+                },
+                error: null
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+    async invoice(req,res,next){
+        try {
+            const {userId} = req.user
+            const {id} = req.params
+            const invoice = await this.#service.invoiceForUser(id,userId)
+            for (let i = 0; i < invoice.length; i++) {
+                const {date,time} = dateToJalali(invoice[i].createdAt)
+                invoice[i].date = date;
+                invoice[i].time = time;
+            }
+            return res.status(200).json({
+                statusCode: 200,
+                data: {
+                    invoice
                 },
                 error: null
             })

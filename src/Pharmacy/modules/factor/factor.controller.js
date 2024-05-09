@@ -1,7 +1,5 @@
 const FactorService = require("./factor.service")
 const autoBind = require("auto-bind");
-const puppeteer = require("puppeteer");
-const createHttpError = require("http-errors");
 const { dateToJalali, createPdf } = require("../../../common/function/function");
 class FactorController{
     #service

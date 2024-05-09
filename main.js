@@ -4,7 +4,7 @@ const swaggerConfig = require("./src/config/swagger.config");
 const AllExceptionHandler = require("./src/common/exception/all-exception.handler");
 const NotFoundHandler = require("./src/common/exception/not-found.handler");
 const AllRouter = require("./src/app.routes");
-const expressEjsLayouts = require("express-ejs-layouts");
+const path = require("path")
 dotenv.config();
 async function main(){
     const app = express();
@@ -16,8 +16,8 @@ async function main(){
         res.status(200).json('Welcome, your app is working well');
       })
     app.use(express.static("public"));
-    app.set('views', './views');
     app.set("view engin","ejs");
+    app.set('views',path.join(__dirname,'views'));
     swaggerConfig(app);
     app.use(AllRouter)
     AllExceptionHandler(app);

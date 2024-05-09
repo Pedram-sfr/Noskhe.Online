@@ -5,6 +5,7 @@ const fs = require("fs")
 const createHttpError = require("http-errors");
 const { stringToObject } = require("../../../common/function/stringToObject");
 const FactorModel = require("./factor.model");
+const { render } = require("ejs");
 class FactorController{
     #service
     constructor(){
@@ -67,41 +68,9 @@ class FactorController{
     }
     async pdf(req,res,next){
         try {
-            const data = {name: "سرماخوردگی", type:"قرص",price: 10000}
-            const html = `<!DOCTYPE html>
-            <html>
-              <head>
-                <meta charset="UTF-8" />
-              </head>
-              <body>
-                <h1>Student</h1>
-                <ul>
-                  <li>First Name: ${data.name}</li>
-                  <li>Last Type: ${data.type}</li>
-                  <li>Price: ${data.price}</li>
-                  <br />
-                </ul>
-              </body>
-            </html>`
-            const browser = await puppeteer.launch();
-            const page = await browser.newPage();
-            //const html = fs.readFileSync('sample.html', 'utf-8');
-             await page.setContent(html, { waitUntil: 'domcontentloaded' });
-             await page.emulateMediaType('screen');
-             const pdf = await page.pdf({
-                path: 'result1.pdf',
-                margin: { top: '20px', right: '10px', bottom: '20px', left: '10px' },
-                printBackground: true,
-                width: "8cm",
-              });
-              await browser.close();
-            return res.status(200).json({
-                statusCode: 200,
-                data: {
-                   
-                },
-                error: null
-            })
+            const {id} = req.params
+            console.log(id);
+            res.render("./pages/invoice.ejs")
         } catch (error) {
             next(error)
         }

@@ -16,6 +16,7 @@ async function main(){
         res.status(200).json('Welcome, your app is working well');
       })
     app.use(express.static("public"));
+    app.set('views', './views');
     app.set("view engin","ejs");
     swaggerConfig(app);
     app.use(AllRouter)

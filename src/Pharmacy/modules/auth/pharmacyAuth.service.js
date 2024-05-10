@@ -5,6 +5,7 @@ const bcrypt = require("bcrypt")
 const jwt = require("jsonwebtoken");
 const PharmacyUserModel = require("../user/pharmacyUser.model");
 const { isFalse } = require("../../../common/function/function");
+const { createWallet, findWalletByUserId } = require("../../../Wallet/modules/order/wallet.service");
 
 class PharmacyAuthService{
     #model;
@@ -17,6 +18,8 @@ class PharmacyAuthService{
         const hashedPassword = await this.createHashPassword(password);
         if(user) throw new createHttpError.BadRequest(PharmacyAuthMessages.OTPCodeNotExpired)
         const newUser = await this.#model.create({mobile,userName,password: hashedPassword})
+        if(isFalse(await findWalletByUserId(user?._id)))
+            await createWallet(newUser._id);
         return newUser;
     }
     async login(userName,password){

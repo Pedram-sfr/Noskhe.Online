@@ -12,6 +12,7 @@ const DrugSchema = new Schema({
     versionKey: false,
 })
 const FactorSchema = new Schema({
+    invoiceId: {type: Number,required: true},
     pharmacyId: {type: Types.ObjectId,required: true,ref: "pharmacyUser"},
     userId: {type: Types.ObjectId,required: true,ref: "user"},
     orderId: {type: Types.ObjectId,required: true,ref: "order"},
@@ -22,6 +23,7 @@ const FactorSchema = new Schema({
     paymentStatus: {type: Boolean,required: true,default: false},
     sendStatus: {type: Boolean,required: true,default: false},
     status: {type: Boolean,required: true,default: true},
+    active: {type: Boolean,required: true,default: true},
     drugs: {type: [DrugSchema],required: true},
 },{timestamps: true,
     versionKey:0,

@@ -1,6 +1,9 @@
 const FactorService = require("./factor.service")
 const autoBind = require("auto-bind");
-const { dateToJalali, createPdf } = require("../../../common/function/function");
+const { dateToJalali, createPdf, codeGen, isFalse } = require("../../../common/function/function");
+const OrderModel = require("../../../User/modules/order/order.model");
+const { addWalletDetail } = require("../../../Wallet/modules/order/wallet.service");
+const createHttpError = require("http-errors");
 class FactorController{
     #service
     constructor(){
@@ -10,14 +13,48 @@ class FactorController{
     async createFactor(req,res,next){
         try {
             const {userId: pharmacyId} = req.pharmacyuser
-            const {user, orderId, addressId, drugs} = req.body;
+            const { orderId, drugs} = req.body;
+            const order = await OrderModel.findById({_id: orderId})
             const drug = JSON.parse(drugs);
             let totalPrice = 0;
             for (let i = 0; i < drug.length; i++) {
                 totalPrice += drug[i]["total"];
             }
-            const data = {pharmacyId,userId: user, orderId, addressId, drugs: drug, totalPrice,shippingCost: 20000};
+            const data = {invoiceId: codeGen(),pharmacyId,userId: order.userId, orderId, addressId: order.addressId, drugs: drug, totalPrice,shippingCost: 20000};
             await this.#service.createFactor(data)
+            return res.status(200).json({
+                statusCode: 200,
+                data: {
+                    message: "success"
+                },
+                error: null
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+    async removeDrugFromFactor(req,res,next){
+        try {
+            const {userId} = req.pharmacyuser
+            const {invoiceId,drug} = req.body;
+            const drugs = JSON.parse(drug);
+            let total = 0,data = {},phData= {};
+            for (let i = 0; i < drugs.length; i++) {
+                total += await this.#service.deleteDrugInFactor(userId,invoiceId,drugs[i]);
+            }
+            const factor = await this.#service.findFactor(invoiceId)
+            console.log(factor.drugs);
+            if(factor.drugs.length == 0){
+                data = {RefNo: codeGen(),amount: total + factor.shippingCost,invoiceId,description: `اصلاحیه فاکتور شماره ${invoiceId}`,state: "برگشت به کیف پول",status: true}
+                factor.active = false;
+            }else{
+                data = {RefNo: codeGen(),amount: total,invoiceId,description: `اصلاحیه فاکتور شماره ${invoiceId}`,state: "برگشت به کیف پول",status: true}
+            }
+            phData = {RefNo: codeGen(),amount: total,invoiceId,description: `اصلاحیه فاکتور شماره ${invoiceId}`,state: "کسر از کیف پول",status: false}
+            factor.totalPrice = factor.totalPrice - total;
+            factor.save();
+            await addWalletDetail(factor.userId,data)
+            await addWalletDetail(userId,phData)
             return res.status(200).json({
                 statusCode: 200,
                 data: {
@@ -66,7 +103,8 @@ class FactorController{
             const {id} = req.params
             const data = await this.#service.findFactorForPrint(id);
             const factor = data[0]
-            const {date, time} = dateToJalali(factor.createdAt)
+            if(isFalse(factor.active)) throw createHttpError.NotFound()
+            const {date, time} = dateToJalali(factor?.createdAt)
             factor.time = time
             factor.date = date
             //createPdf(factor)

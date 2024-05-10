@@ -52,6 +52,22 @@
  */
 /**
  * @swagger
+ * /pharmacy/wallet:
+ *  get:
+ *      summary: get user profile
+ *      tags:
+ *          -   Pharmacy
+ *      parameters:
+ *          -   in: header
+ *              name: accesstoken
+ *              example: Bearer yourtoken
+ *      responses:
+ *          200:
+ *              description: success
+ *      
+ */
+/**
+ * @swagger
  * /pharmacy/edit-profile:
  *  patch:
  *      summary: edit user profile

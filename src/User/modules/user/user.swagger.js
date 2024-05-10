@@ -39,6 +39,22 @@
  */
 /**
  * @swagger
+ * /user/wallet:
+ *  get:
+ *      summary: get user wallet
+ *      tags:
+ *          -   User
+ *      parameters:
+ *          -   in: header
+ *              name: accesstoken
+ *              example: Bearer yourtoken
+ *      responses:
+ *          200:
+ *              description: success
+ *      
+ */
+/**
+ * @swagger
  * /user/edit-profile:
  *  patch:
  *      summary: edit user profile

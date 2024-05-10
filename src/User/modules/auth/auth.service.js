@@ -6,6 +6,8 @@ const {randomInt} = require("crypto")
 const jwt = require("jsonwebtoken");
 const { resolve } = require("path");
 const { rejects } = require("assert");
+const { findWalletByUserId, createWallet } = require("../../../Wallet/modules/order/wallet.service");
+const { isFalse } = require("../../../common/function/function");
 
 class AuthService{
     #model;
@@ -16,12 +18,14 @@ class AuthService{
     async sendOTP(mobile){
         const user = await this.#model.findOne({mobile});
         const now = new Date().getTime();
+        const wallet = await findWalletByUserId(user?._id)
         const otp = {
             code : randomInt(10000,99999),
             expiresIn : now + (1000*60*2)
         }
         if(!user){
             const newUser = await this.#model.create({mobile,otp})
+            if(isFalse(wallet)) await createWallet(newUser._id)
             return newUser
         }
         if(user.otp && user.otp.expiresIn > now) throw new createHttpError.BadRequest(AuthMessages.OTPCodeNotExpired)

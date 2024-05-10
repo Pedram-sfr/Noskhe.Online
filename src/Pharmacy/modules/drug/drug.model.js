@@ -15,5 +15,6 @@ const DrugSchema = new Schema({
 },{timestamps: true,
     versionKey:0,
 })
+DrugListSchema.index({drugName: "text"})
 const DrugModel = model("drug",DrugSchema);
 module.exports = DrugModel

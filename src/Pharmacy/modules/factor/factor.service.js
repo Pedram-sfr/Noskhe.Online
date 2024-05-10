@@ -3,6 +3,8 @@ const FactorModel = require("./factor.model");
 const createHttpError = require("http-errors");
 const OrderModel = require("../../../User/modules/order/order.model");
 const { Types } = require("mongoose");
+const { isTrue, codeGen } = require("../../../common/function/function");
+const { addWalletDetail } = require("../../../Wallet/modules/order/wallet.service");
 
 class FactorService{
     #model;
@@ -46,11 +48,35 @@ class FactorService{
         if(!res) throw createHttpError.InternalServerError("خطای سرور")
         return res
     } 
-    async findFactorForPrint(factorId){
-        const fc = await this.#model.findById(factorId)
+    async deleteDrugInFactor(pharmacyId,invoiceId,drugId){
+        const factor = await this.#model.findOne({invoiceId,pharmacyId,"drugs._id": drugId})
+        if(!factor) throw createHttpError.NotFound("یافت نشد")
+        let total= 0 ;
+        for (let i = 0; i < factor.drugs.length; i++) {
+            if(factor.drugs[i]._id.equals(new Types.ObjectId(drugId))) total = factor.drugs[i].total
+        }
+        const remove = await this.#model.updateOne({
+            invoiceId: invoiceId
+        },{
+            $pull: {
+                "drugs": {
+                    _id: drugId
+                }
+            }
+        })
+        console.log(total);
+        return total
+    } 
+    async findFactor(invoiceId){
+        const factor = this.#model.findOne({invoiceId});
+        if(!factor) throw createHttpError.NotFound("یافت نشد")
+        return factor
+    }
+    async findFactorForPrint(invoiceId){
+        const fc = await this.#model.findOne({invoiceId})
         if(!fc) throw createHttpError.NotFound("یافت نشد")
         const factor = await this.#model.aggregate([
-            {$match: {_id: new Types.ObjectId(factorId)}},
+            {$match: {_id: fc?._id}},
             {$lookup: {
                 from: "pharmacyusers",
                 foreignField: "_id",

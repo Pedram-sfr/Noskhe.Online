@@ -38,7 +38,16 @@ class DrugController{
     async drugList(req,res,next){
         try {
             const {userId} = req.pharmacyuser
-            const {drugs} = await this.#service.findDrugList(userId)
+            const {search} = req.query
+            const data = await this.#service.findDrugList(userId)
+            let drugs = []
+            if(search){
+                for(var i=0; i<data.length; i++) {
+                    if(data[i]['drugName'].indexOf(search)!=-1) {
+                        drugs.push(data[i]);
+                    }
+                }
+            }else drugs = data;
             return res.status(200).json({
                 statusCode: 200,
                 data: {

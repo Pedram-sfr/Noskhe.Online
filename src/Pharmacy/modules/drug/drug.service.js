@@ -19,9 +19,10 @@ class DrugService{
         return drug
     } 
     async findDrugList(pharmacyId){
-        const drug = await this.#model.findOne({pharmacyId},{drugs: 1,_id: 0,})
+        
+        const drug =  await this.#model.findOne({pharmacyId},{drugs: 1,_id: 0,})
         if(!drug) createHttpError.NotFound("یافت نشد")
-        return drug
+        return drug.drugs
     } 
     async removeDrugList(pharmacyId){
         const drug = await this.#model.deleteOne({pharmacyId})
@@ -35,7 +36,6 @@ class DrugService{
             }})
         return drug
     } 
-
 
 }
 

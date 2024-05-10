@@ -8,6 +8,7 @@ router.get("/pdf/:id",FactorController.pdf)
 router.get("/orderList",AuthorizationPharmacy,FactorController.orderList)
 router.get("/order/:orderId",AuthorizationPharmacy,FactorController.order)
 router.post("/create",AuthorizationPharmacy,FactorController.createFactor)
+router.patch("/removeDrug",AuthorizationPharmacy,FactorController.removeDrugFromFactor)
 module.exports = {
     FactorRouter: router
 }

@@ -63,6 +63,9 @@
  *          -   in: header
  *              name: accesstoken
  *              example: Bearer yourtoken
+ *          -   in: query
+ *              name: search
+ *              type: string
  *      responses:
  *          200:
  *              description: success

@@ -3,6 +3,7 @@ const moment = require("jalali-moment");
 const path = require("path")
 const ejs = require("ejs");
 const puppeteer = require("puppeteer");
+const { randomInt } = require("crypto");
 
 const isTrue = (value) => ["true",1,true].includes(value);
 const isFalse = (value) => ["false",0,false].includes(value);
@@ -40,9 +41,12 @@ function excelToArray(excel) {
 }
 function dateToJalali(data) {
   const d = data.toString().split("T")[0].split(" ")
-  const date = moment(`${d[1]}-${d[2]}-${d[3]}`,'MMM-DD-YYYY').locale('fa').format('YYYY/MM/DD');
-  const time = d[4]
+  const date = moment(data).locale('fa').format('YYYY MMMM DD');
+  const time = moment(data).locale('fa').format('HH:mm')
   return {date,time}
+}
+function codeGen() {
+  return Math.floor(new Date().valueOf()*randomInt(1000,9999))
 }
 
 function createPdf(factor) {
@@ -73,5 +77,6 @@ module.exports ={
     deleteNulishObject,
     excelToArray,
     dateToJalali,
-    createPdf
+    createPdf,
+    codeGen
 }

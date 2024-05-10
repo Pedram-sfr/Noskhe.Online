@@ -13,17 +13,21 @@
  *              type: object
  *              required:
  *                  -   orderId
- *                  -   user
- *                  -   addressId
  *                  -   drugs
  *              properties:
  *                  orderId:
  *                      type: string
- *                  user:
- *                      type: string
- *                  addressId:
- *                      type: string
  *                  drugs:
+ *                      type: string
+ *          removeDrug:
+ *              type: object
+ *              required:
+ *                  -   invoiceId
+ *                  -   drug
+ *              properties:
+ *                  invoiceId:
+ *                      type: number
+ *                  drug:
  *                      type: string
  */
 
@@ -90,6 +94,27 @@
  *              application/x-www-form-urlencoded:
  *                  schema:
  *                      $ref: "#/components/schemas/CreateFactor"
+ *      responses:
+ *          200:
+ *              description: success
+ *      
+ */
+/**
+ * @swagger
+ * /pharmacy/factor/removeDrug:
+ *  patch:
+ *      summary: get order list
+ *      tags:
+ *          -   Pharmacy-Factor
+ *      parameters:
+ *          -   in: header
+ *              name: accesstoken
+ *              example: Bearer yourtoken
+ *      requestBody:
+ *          content:
+ *              application/x-www-form-urlencoded:
+ *                  schema:
+ *                      $ref: "#/components/schemas/removeDrug"
  *      responses:
  *          200:
  *              description: success

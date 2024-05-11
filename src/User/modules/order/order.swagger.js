@@ -13,17 +13,10 @@
  *              type: object
  *              required:
  *                  -   addressId
- *                  -   myself
  *              properties:
  *                  addressId:
  *                      type: string
  *                  description:
- *                      type: string
- *                  myself:
- *                      type: boolean
- *                  fullName:
- *                      type: string
- *                  mobile:
  *                      type: string
  *          ElecPrescription:
  *              type: object
@@ -48,16 +41,6 @@
  *                      type: string
  *                  image:
  *                      type: file
- *          ordertopharm:
- *              type: object
- *              required:
- *                  -   orderId
- *                  -   pharmacyId
- *              properties:
- *                  orderId:
- *                      type: string
- *                  pharmacyId:
- *                      type: string
  *          List:
  *              type: object
  *              required:
@@ -174,23 +157,6 @@
  *              application/x-www-form-urlencoded:
  *                  schema:
  *                      $ref: "#/components/schemas/ElecPrescription"
- *      responses:
- *          200:
- *              description: success
- *      
- */
-/**
- * @swagger
- * /user/order/OrderToPharmacy:
- *  post:
- *      summary: add order to pharmacy
- *      tags:
- *          -   User-Order
- *      requestBody:
- *          content:
- *              application/x-www-form-urlencoded:
- *                  schema:
- *                      $ref: "#/components/schemas/ordertopharm"
  *      responses:
  *          200:
  *              description: success

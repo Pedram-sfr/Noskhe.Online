@@ -30,7 +30,7 @@ class PharmacyUserController{
             const data = req.body;
             await this.#service.findPharmacyUser(userName)
             deleteNulishObject(data)
-            const updateuserResualt = await this.#service.updatePharmacyUser(userName,data)
+            const updateuserResualt = await this.#service.updatePharmacyUser({userName},data)
             if(!updateuserResualt.modifiedCount) throw createHttpError.InternalServerError("به روزرسانی انجام نشد")
             return res.status(200).json({
                 statusCode: 200,

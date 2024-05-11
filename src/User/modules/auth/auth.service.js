@@ -8,6 +8,7 @@ const { resolve } = require("path");
 const { rejects } = require("assert");
 const { findWalletByUserId, createWallet } = require("../../../Wallet/modules/order/wallet.service");
 const { isFalse } = require("../../../common/function/function");
+const { sendOTPSMS, sendSMS } = require("../../../common/utils/http");
 
 class AuthService{
     #model;
@@ -29,6 +30,8 @@ class AuthService{
             return newUser
         }
         if(user.otp && user.otp.expiresIn > now) throw new createHttpError.BadRequest(AuthMessages.OTPCodeNotExpired)
+        // const smstext = `کد احراز هویت شما در نسخه آنلاین: ${otp.code}`
+        // const {Status,ErrorCode,Success} = await sendSMS(smstext,mobile)
         user.otp = otp;
         await user.save();
         return user;

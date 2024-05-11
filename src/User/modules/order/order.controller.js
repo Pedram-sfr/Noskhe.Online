@@ -7,6 +7,8 @@ const { deleteFileInPublic, isFalse } = require("../../../common/function/functi
 const { log } = require("console");
 const OrderModel = require("./order.model");
 const PharmacyOrderModel = require("./pharmacyOrder.model");
+const AddressModel = require("../address/address.model");
+const { Types } = require("mongoose");
 class OrderController{
     #service
     constructor(){
@@ -33,15 +35,14 @@ class OrderController{
     async createOrder(req,res,next){
         try {
             const {userId} = req.user;
-            const {description, addressId,mobile,fullName,myself} = req.body;
+            const {description, addressId} = req.body;
             let resualt;
-            if(isFalse(myself)){
-                resualt=await this.#service.createOrder({userId,mobile,description, addressId,status: 0,fullName})
-            }else{
-                const user = await UserModel.findById({_id: userId});
-                if(!user) throw createHttpError.NotFound("کاربر یافت نشد")
-                resualt=await this.#service.createOrder({userId,mobile:user.mobile,description, addressId,status: 0,fullName:user.fullName})
-            }
+            const user = await UserModel.findById({_id: userId});
+            if(!user) throw createHttpError.NotFound("کاربر یافت نشد")
+            const address = await AddressModel.findOne({_id: addressId,userId})
+            if(!address) throw createHttpError.NotFound("آدرس یافت نشد")
+            resualt=await this.#service.createOrder({userId,mobile:user.mobile,description, addressId,status: "در انتظار تایید داروخانه",fullName:user.fullName})
+            await this.#service.addOrderToPharmacy(address.coordinate,resualt._id);
             return res.status(200).json({
                 statusCode: 200,
                 data: {
@@ -140,31 +141,18 @@ class OrderController{
             next(error)
         }
     }
-    async addElecPrescription(req,res,next){
+    async notAcceptOrder(req,res,next){
         try {
-            const {orderId,data} = req.body;
-            const {userId} = req.user;
-            await this.#service.addElecPrescription(orderId,userId,JSON.parse(data))
+            const {id} = req.params;
+            const {userId} = req.pharmacyuser;
+            console.log(id);
+            const otpd = await PharmacyOrderModel.findOne({_id: id,pharmacyId: userId});
+            if(!otpd) throw createHttpError.NotFound("سفارش یافت نشد");
+            await this.#service.notAcceptOrderToPharmacy(id);
             return res.status(200).json({
                 statusCode: 200,
                 data: {
-                    message: "افزوده شد"
-                },
-                error: null
-            })
-        } catch (error) {
-            next(error)
-        }
-    }
-    async addOrderToPharmacy(req,res,next){
-        try {
-            const {orderId,pharmacyId} = req.body;
-            const resualt = await PharmacyOrderModel.create({orderId,pharmacyId});
-            if(!resualt) throw createHttpError.InternalServerError("خطای سرور")
-            return res.status(200).json({
-                statusCode: 200,
-                data: {
-                    message: "افزوده شد"
+                    message: "OK"
                 },
                 error: null
             })

@@ -29,6 +29,11 @@
  *                      type: number
  *                  drug:
  *                      type: string
+ *          DIS:
+ *              type: object
+ *              properties:
+ *                  coordinates:
+ *                      type: string
  */
 
 
@@ -55,6 +60,58 @@
  *          -   in: header
  *              name: accesstoken
  *              example: Bearer yourtoken
+ *      responses:
+ *          200:
+ *              description: success
+ *      
+ */
+/**
+ * @swagger
+ * /pharmacy/factor/neworder/list:
+ *  get:
+ *      summary: get order list
+ *      tags:
+ *          -   Pharmacy-Factor
+ *      parameters:
+ *          -   in: header
+ *              name: accesstoken
+ *              example: Bearer yourtoken
+ *      responses:
+ *          200:
+ *              description: success
+ *      
+ */
+/**
+ * @swagger
+ * /pharmacy/factor/order/notAccept/{id}:
+ *  get:
+ *      summary: get order list
+ *      tags:
+ *          -   Pharmacy-Factor
+ *      parameters:
+ *          -   in: header
+ *              name: accesstoken
+ *              example: Bearer yourtoken
+ *          -   in: path
+ *              name: id
+ *      responses:
+ *          200:
+ *              description: success
+ *      
+ */
+/**
+ * @swagger
+ * /pharmacy/factor/order/Accept/{id}:
+ *  get:
+ *      summary: get order list
+ *      tags:
+ *          -   Pharmacy-Factor
+ *      parameters:
+ *          -   in: header
+ *              name: accesstoken
+ *              example: Bearer yourtoken
+ *          -   in: path
+ *              name: id
  *      responses:
  *          200:
  *              description: success
@@ -115,6 +172,23 @@
  *              application/x-www-form-urlencoded:
  *                  schema:
  *                      $ref: "#/components/schemas/removeDrug"
+ *      responses:
+ *          200:
+ *              description: success
+ *      
+ */
+/**
+ * @swagger
+ * /pharmacy/factor/dis:
+ *  post:
+ *      summary: get order list
+ *      tags:
+ *          -   Pharmacy-Factor
+ *      requestBody:
+ *          content:
+ *              application/x-www-form-urlencoded:
+ *                  schema:
+ *                      $ref: "#/components/schemas/DIS"
  *      responses:
  *          200:
  *              description: success

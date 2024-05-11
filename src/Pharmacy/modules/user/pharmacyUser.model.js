@@ -12,9 +12,8 @@ const PharmacyUserSchema = new Schema({
     city : {type: String, required: false},
     district : {type: String, required: false},
     address : {type: String, required: false},
-    lat : {type: Number, required: false},
-    lng : {type: Number, required: false},
+    location : {type: Object, required: true},
 },{timestamps: true,versionKey:0})
-
+PharmacyUserSchema.index({location: "2dsphere"});
 const PharmacyUserModel = model("pharmacyUser",PharmacyUserSchema);
 module.exports = PharmacyUserModel

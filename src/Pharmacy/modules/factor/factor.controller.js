@@ -4,6 +4,7 @@ const { dateToJalali, createPdf, codeGen, isFalse } = require("../../../common/f
 const OrderModel = require("../../../User/modules/order/order.model");
 const { addWalletDetail } = require("../../../Wallet/modules/order/wallet.service");
 const createHttpError = require("http-errors");
+const PharmacyOrderModel = require("../../../User/modules/order/pharmacyOrder.model");
 class FactorController{
     #service
     constructor(){
@@ -85,12 +86,50 @@ class FactorController{
         try {
             const {userId} = req.pharmacyuser
             const {orderId} = req.params
-        console.log(orderId);
             const order = await this.#service.orderForPharmacy(userId,orderId);
             return res.status(200).json({
                 statusCode: 200,
                 data: {
                    order
+                },
+                error: null
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+    async acceptOrder(req,res,next){
+        try {
+            const {userId} = req.pharmacyuser
+            const {id} = req.params
+            const po = await PharmacyOrderModel.findOne({_id: id,pharmacyId: userId});
+            if(!po) throw createHttpError.BadRequest()
+            const order = await OrderModel.findById(po.orderId);
+            if(!order) throw createHttpError.BadRequest()
+            order.pharmId = userId;
+            order.accepted = true;
+            order.status = "پردازش توسط داروخانه"
+            order.save();
+            await PharmacyOrderModel.deleteOne({_id: id});
+            return res.status(200).json({
+                statusCode: 200,
+                data: {
+                   message: "OK"
+                },
+                error: null
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+    async newOrderList(req,res,next){
+        try {
+            const {userId} = req.pharmacyuser
+            const pod = await this.#service.findNewOrder(userId)
+            return res.status(200).json({
+                statusCode: 200,
+                data: {
+                   pod
                 },
                 error: null
             })
@@ -109,6 +148,25 @@ class FactorController{
             factor.date = date
             //createPdf(factor)
             return res.render("invoice.ejs",{factor})
+
+        } catch (error) {
+            next(error)
+        }
+    }
+    async dis(req,res,next){
+        try {
+            const {coordinates} = req.body;
+            const data = JSON.parse(coordinates)
+            const dis = await this.#service.calDistanceCordinate(data)
+            const len = dis.length;
+            return res.status(200).json({
+                statusCode: 200,
+                data: {
+                    len,
+                    dis
+                },
+                error: null
+            })
 
         } catch (error) {
             next(error)

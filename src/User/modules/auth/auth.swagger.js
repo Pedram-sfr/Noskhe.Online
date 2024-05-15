@@ -26,6 +26,22 @@
  *                      type: string
  *                  code:
  *                      type: string
+ *          RegisterCheckOTP:
+ *              type: object
+ *              required:
+ *                  -   mobile
+ *                  -   code
+ *                  -   fullName
+ *                  -   nationalCode
+ *              properties:
+ *                  mobile:
+ *                      type: string
+ *                  code:
+ *                      type: string
+ *                  fullName:
+ *                      type: string
+ *                  nationalCode:
+ *                      type: string
  *          RefreshToken:
  *              type: object
  *              required:
@@ -84,6 +100,40 @@
  */
 /**
  * @swagger
+ * /user/auth/register/send-otp:
+ *  post:
+ *      summary: login with otp and mobile
+ *      tags:
+ *          -   Auth
+ *      requestBody:
+ *          content:
+ *              application/x-www-form-urlencoded:
+ *                  schema:
+ *                      $ref: "#/components/schemas/SendOTP"
+ *      responses:
+ *          200:
+ *              description: success
+ *      
+ */
+/**
+ * @swagger
+ * /user/auth/register/check-otp:
+ *  post:
+ *      summary: login with otp and mobile
+ *      tags:
+ *          -   Auth
+ *      requestBody:
+ *          content:
+ *              application/x-www-form-urlencoded:
+ *                  schema:
+ *                      $ref: "#/components/schemas/RegisterCheckOTP"
+ *      responses:
+ *          200:
+ *              description: success
+ *      
+ */
+/**
+ * @swagger
  * /user/auth/refresh-token:
  *  post:
  *      summary: sign refreshToken
@@ -123,6 +173,10 @@
  *      summary: logout user from account
  *      tags:
  *          -   Auth
+ *      parameters:
+ *          -   in: header
+ *              name: accesstoken
+ *              example: Bearer yourtoken
  *      responses:
  *          200:
  *              description: success

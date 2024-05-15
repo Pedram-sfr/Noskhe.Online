@@ -15,10 +15,19 @@
  *                  -   lat
  *                  -   lng
  *                  -   myself
+ *                  -   address
+ *                  -   province
+ *                  -   city
  *              properties:
  *                  lat:
- *                      type: string
+ *                      type: number
  *                  lng:
+ *                      type: number
+ *                  address:
+ *                      type: string
+ *                  province:
+ *                      type: string
+ *                  city:
  *                      type: string
  *                  myself:
  *                      type: boolean
@@ -32,8 +41,14 @@
  *                  -   addressId
  *              properties:
  *                  lat:
- *                      type: string
+ *                      type: number
  *                  lng:
+ *                      type: number
+ *                  address:
+ *                      type: string
+ *                  province:
+ *                      type: string
+ *                  city:
  *                      type: string
  *                  myself:
  *                      type: boolean
@@ -64,7 +79,7 @@
  *      responses:
  *          200:
  *              description: success
- *      
+ *
  */
 /**
  * @swagger
@@ -85,7 +100,7 @@
  *      responses:
  *          200:
  *              description: success
- *      
+ *
  */
 /**
  * @swagger
@@ -103,7 +118,7 @@
  *      responses:
  *          200:
  *              description: success
- *      
+ *
  */
 /**
  * @swagger
@@ -119,5 +134,5 @@
  *      responses:
  *          200:
  *              description: success
- *      
+ *
  */

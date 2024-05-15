@@ -8,7 +8,8 @@ const router = require("express").Router();
 
 
 router.post("/addOTC",Authorization,uploadFile.single("image"),orderController.addOTC)
-router.get("/list/:orderId",Authorization,orderController.OrderList)
+router.get("/list",Authorization,orderController.OrderList)
+router.get("/:orderId",Authorization,orderController.OrderWithOrderId)
 router.post("/uploadPrescription",Authorization,uploadFile.single("image"),orderController.addUploadPrescription)
 router.post("/elecPrescription",Authorization,orderController.addElecPrescription)
 router.post("/create",Authorization,orderController.createOrder)

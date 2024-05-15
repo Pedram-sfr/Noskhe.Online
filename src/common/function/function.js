@@ -46,7 +46,7 @@ function dateToJalali(data) {
   return {date,time}
 }
 function codeGen() {
-  return Math.floor(new Date().valueOf()*randomInt(1000,9999))
+  return Math.floor(new Date().valueOf()*randomInt(100,999))
 }
 
 function createPdf(factor) {

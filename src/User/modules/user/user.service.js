@@ -15,8 +15,33 @@ class UserService{
         this.#factorModel = FactorModel;
     }
     
-    async findUser(mobile){
-        const user = await this.#model.findOne({mobile},{_id: 0,otp: 0,verfiedMobile:0,createdAt: 0,updatedAt:0,});
+    async findUser(userId){
+        console.log(userId);
+        // const user = await this.#model.findOne({mobile},{_id: 0,otp: 0,verfiedMobile:0,createdAt: 0,updatedAt:0,});
+        const user = await this.#model.aggregate([
+            {$match: {_id: new Types.ObjectId(userId)}},
+            {$lookup: {
+                from: "wallets",
+                foreignField: "userId",
+                localField: "_id",
+                as: "wallet"
+            }},
+            {
+                $unwind: {
+                    path: "$wallet",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $addFields: {
+                    walletBalance: "$wallet.cash",
+                }
+            },{
+                $project:{
+                    _id: 0,otp: 0,verfiedMobile:0,createdAt: 0,updatedAt:0,wallet: 0
+                }
+            }
+        ])
         if(!user) throw createHttpError.NotFound(UserMessages.NotFound)
         return user
     } 

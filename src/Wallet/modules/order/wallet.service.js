@@ -20,12 +20,8 @@ class WalletService{
         return true
     } 
     async findWalletByUserIdForProfile(userId){
-        const wallet = await this.#model.findOne({userId},{_id: 0,updatedAt: 0,createdAt: 0,"detail.updatedAt": 0,"detail._id": 0}).lean()
+        const wallet = await this.#model.findOne({userId},{_id: 0,updatedAt: 0,createdAt: 0,"detail.updatedAt": 0,"detail._id": 0},{_id: -1}).lean()
         if(!wallet) throw createHttpError.NotFound("یافت نشد")
-        for (let i = 0; i < wallet?.detail.length; i++) {
-            const {date, time} = dateToJalali(wallet.detail[i]["createdAt"])
-            wallet.detail[i].createdAt = {date,time}
-        }
         return wallet
     } 
     async addWalletDetail(userId,data){

@@ -11,8 +11,8 @@ class UserController{
     }
     async profile(req,res,next){
         try {
-            const {mobile} = req.user
-            const user = await this.#service.findUser(mobile)
+            const {userId} = req.user
+            const user = await this.#service.findUser(userId)
             return res.status(200).json({
                 statusCode: 200,
                 data: {

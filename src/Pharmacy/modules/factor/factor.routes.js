@@ -9,10 +9,11 @@ const router = require("express").Router();
 router.get("/pdf/:id",FactorController.pdf)
 router.get("/neworder/list",AuthorizationPharmacy,FactorController.newOrderList)
 router.get("/order/notAccept/:id",AuthorizationPharmacy,orderController.notAcceptOrder)
-router.get("/order/Accept/:id",AuthorizationPharmacy,FactorController.acceptOrder)
+router.post("/order/Accept",AuthorizationPharmacy,FactorController.acceptOrder)
 router.get("/orderList",AuthorizationPharmacy,FactorController.orderList)
 router.get("/order/:orderId",AuthorizationPharmacy,FactorController.order)
 router.post("/create",AuthorizationPharmacy,FactorController.createFactor)
+router.post("/createDrug",AuthorizationPharmacy,FactorController.drugFactor)
 router.patch("/removeDrug",AuthorizationPharmacy,FactorController.removeDrugFromFactor)
 router.post("/dis",FactorController.dis)
 module.exports = {

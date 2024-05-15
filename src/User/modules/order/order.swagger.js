@@ -22,22 +22,34 @@
  *              type: object
  *              required:
  *                  -   orderId
- *                  -   data
+ *                  -   trackingCode
+ *                  -   doctorName
+ *                  -   nationalCode
+ *                  -   typeOfInsurance 
  *              properties:
  *                  orderId:
  *                      type: string
- *                  data:
+ *                  trackingCode:
+ *                      type: string
+ *                  nationalCode:
+ *                      type: string
+ *                  typeOfInsurance:
+ *                      type: string
+ *                  doctorName:
  *                      type: string
  *          AddOTC:
  *              type: object
  *              required:
  *                  -   orderId
- *                  -   data
- *                  -   image
+ *                  -   count
  *              properties:
  *                  orderId:
  *                      type: string
- *                  data:
+ *                  drugName:
+ *                      type: string
+ *                  type:
+ *                      type: string
+ *                  count:
  *                      type: string
  *                  image:
  *                      type: file
@@ -104,7 +116,29 @@
  */
 /**
  * @swagger
- * /user/order/list/{orderId}:
+ * /user/order/list:
+ *  get:
+ *      summary: orderList with id
+ *      tags:
+ *          -   User-Order
+ *      parameters:
+ *          -   in: header
+ *              name: accesstoken
+ *              example: Bearer yourtoken
+ *          -   in: query
+ *              name: page
+ *              type: number
+ *          -   in: query
+ *              name: perpage
+ *              type: number
+ *      responses:
+ *          200:
+ *              description: success
+ *      
+ */
+/**
+ * @swagger
+ * /user/order/{orderId}:
  *  get:
  *      summary: orderList with id
  *      tags:

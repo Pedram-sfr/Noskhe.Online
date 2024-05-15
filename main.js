@@ -10,9 +10,10 @@ async function main(){
     const app = express();
     port = process.env.PORT
     require("./src/config/mongoose.config");
+    require("./src/common/utils/initRedis")
     app.use(express.json());
     app.use(express.urlencoded({extended: true}));
-    app.get('/home', (req, res) => {
+    app.get('/', (req, res) => {
         res.status(200).json('Welcome, your app is working well');
       })
     app.use(express.static("public"));

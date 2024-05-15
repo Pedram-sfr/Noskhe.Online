@@ -13,12 +13,29 @@
  *              type: object
  *              required:
  *                  -   orderId
- *                  -   drugs
  *              properties:
  *                  orderId:
  *                      type: string
- *                  drugs:
+ *          CreateDrugFactor:
+ *              type: object
+ *              required:
+ *                  -   factorId
+ *                  -   drugId
+ *                  -   count
+ *                  -   action
+ *              properties:
+ *                  factorId:
  *                      type: string
+ *                  drugId:
+ *                      type: string
+ *                  count:
+ *                      type: string
+ *                  action:
+ *                      type: string
+ *                      enum:
+ *                          -   INCREMENT
+ *                          -   DECREMENT
+ *                      
  *          removeDrug:
  *              type: object
  *              required:
@@ -28,6 +45,13 @@
  *                  invoiceId:
  *                      type: number
  *                  drug:
+ *                      type: string
+ *          Accept:
+ *              type: object
+ *              required:
+ *                  -   id
+ *              properties:
+ *                  id:
  *                      type: string
  *          DIS:
  *              type: object
@@ -60,6 +84,12 @@
  *          -   in: header
  *              name: accesstoken
  *              example: Bearer yourtoken
+ *          -   in: query
+ *              name: page
+ *              type: number
+ *          -   in: query
+ *              name: perpage
+ *              type: number
  *      responses:
  *          200:
  *              description: success
@@ -76,6 +106,12 @@
  *          -   in: header
  *              name: accesstoken
  *              example: Bearer yourtoken
+ *          -   in: query
+ *              name: page
+ *              type: number
+ *          -   in: query
+ *              name: perpage
+ *              type: number
  *      responses:
  *          200:
  *              description: success
@@ -101,8 +137,8 @@
  */
 /**
  * @swagger
- * /pharmacy/factor/order/Accept/{id}:
- *  get:
+ * /pharmacy/factor/order/Accept:
+ *  post:
  *      summary: get order list
  *      tags:
  *          -   Pharmacy-Factor
@@ -110,8 +146,11 @@
  *          -   in: header
  *              name: accesstoken
  *              example: Bearer yourtoken
- *          -   in: path
- *              name: id
+ *      requestBody:
+ *          content:
+ *              application/x-www-form-urlencoded:
+ *                  schema:
+ *                      $ref: "#/components/schemas/Accept"
  *      responses:
  *          200:
  *              description: success
@@ -151,6 +190,27 @@
  *              application/x-www-form-urlencoded:
  *                  schema:
  *                      $ref: "#/components/schemas/CreateFactor"
+ *      responses:
+ *          200:
+ *              description: success
+ *      
+ */
+/**
+ * @swagger
+ * /pharmacy/factor/createDrug:
+ *  post:
+ *      summary: get order list
+ *      tags:
+ *          -   Pharmacy-Factor
+ *      parameters:
+ *          -   in: header
+ *              name: accesstoken
+ *              example: Bearer yourtoken
+ *      requestBody:
+ *          content:
+ *              application/x-www-form-urlencoded:
+ *                  schema:
+ *                      $ref: "#/components/schemas/CreateDrugFactor"
  *      responses:
  *          200:
  *              description: success

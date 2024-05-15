@@ -60,7 +60,10 @@ class PharmacyAuthController{
     }
     async logout(req,res,next){
         try {
-            console.log(req.pharmacyuser);
+            const {userId,token} = req.pharmacyuser;
+            await redisClient.set(String(userId), token, { EX: (24*60*60) }, (err) => {
+                if (err) return err.message;
+            });
             return res.status(200).json({
                 statusCode: 200,
                 data: {

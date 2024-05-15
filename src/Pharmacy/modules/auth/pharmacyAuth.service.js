@@ -48,6 +48,11 @@ class PharmacyAuthService{
         return jwt.sign(payload,process.env.JWT_REFRESHSECRET_KEY_PHARM,{expiresIn: "1d"});
     }
     async verifyRefreshToken(token){
+        const jwtr = jwt.verify(
+            token,
+            process.env.JWT_REFRESHSECRET_KEY_PHARM)
+        const block = await redisClient.get(jwtr?.userId);
+        if(block) throw new createHttpError.Unauthorized();
         return new Promise((resolve,reject) => {
             jwt.verify(token,process.env.JWT_REFRESHSECRET_KEY_PHARM,async (err,payload)=>{
                 if(err) return reject(createHttpError.Unauthorized(PharmacyAuthMessages.TokenIsInvalid))

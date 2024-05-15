@@ -1,10 +1,10 @@
 const { Schema, model, Types } = require("mongoose");
 
 const OTCSchema = new Schema({
-    type: {type: String,required: true},
+    type: {type: String,required: false},
     count: {type: Number,required: true},
-    image: {type: String, required: true},
-    drugName: {type: String, required: true},
+    image: {type: String, required: false},
+    drugName: {type: String, required: false},
 },{
     versionKey: false,
     toJSON:{
@@ -44,7 +44,7 @@ const OrderSchema = new Schema({
     pharmId : {type: Types.ObjectId, required: false,ref: "pharmacyUser"},
     addressId : {type: Types.ObjectId,ref: "address", required: true},
     description: {type: String, required: false},
-    status: {type: String, required: false},
+    status: {type: String, required: false,enum: ['SUCCESS','PENDING','FAILED'],default: 'PENDING'},
     otc: {type: [OTCSchema],required: false},
     uploadPrescription: {type: [UploadPrescriptionSchema],required: false},
     elecPrescription: {type: [ElecPrescriptionSchema],required: false},

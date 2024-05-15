@@ -1,6 +1,7 @@
 const { Schema, model, Types } = require("mongoose");
 
 const DrugSchema = new Schema({
+    drugId: {type: Types.ObjectId,required: true},
     drugName: {type: String,required: true},
     drugType: {type: String,required: true},
     price: {type: Number, required: true},

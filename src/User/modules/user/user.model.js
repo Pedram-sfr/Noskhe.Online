@@ -1,16 +1,13 @@
 const { Schema, model } = require("mongoose");
 
-const OTPSchema = new Schema({
-    code: {type: String,required: false,default: undefined},
-    expiresIn: {type: Number,required: false, default: 0},
-})
-const UserSchema = new Schema({
-    fullName: {type: String,required: false},
-    nationalCode: {type: String,required: false},
-    mobile: {type: String,required: true, unique: true},
-    otp: {type: OTPSchema},
-    verfiedMobile: {type: Boolean,required: true, default: false},
-},{timestamps: true,versionKey:0})
+const UserSchema = new Schema(
+  {
+    fullName: { type: String, required: true },
+    nationalCode: { type: String, required: true },
+    mobile: { type: String, required: true, unique: true },
+  },
+  { timestamps: true, versionKey: 0 }
+);
 
-const UserModel = model("user",UserSchema);
-module.exports = UserModel
+const UserModel = model("user", UserSchema);
+module.exports = UserModel;

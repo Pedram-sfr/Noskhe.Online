@@ -5,12 +5,14 @@ const AllExceptionHandler = require("./src/common/exception/all-exception.handle
 const NotFoundHandler = require("./src/common/exception/not-found.handler");
 const AllRouter = require("./src/app.routes");
 const path = require("path")
+const cors = require("cors")
 dotenv.config();
 async function main(){
     const app = express();
     port = process.env.PORT
     require("./src/config/mongoose.config");
-    require("./src/common/utils/initRedis")
+    require("./src/common/utils/initRedis");
+    app.use(cors({origin: true,exposedHeaders: true}))
     app.use(express.json());
     app.use(express.urlencoded({extended: true}));
     app.get('/', (req, res) => {

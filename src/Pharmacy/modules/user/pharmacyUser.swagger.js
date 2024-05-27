@@ -28,10 +28,8 @@
  *                      type: string
  *                  address:
  *                      type: string
- *                  lat:
- *                      type: number
- *                  lng:
- *                      type: number
+ *                  coordinates:
+ *                      type: string
  */
 
 /**

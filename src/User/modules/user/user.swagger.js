@@ -30,7 +30,7 @@
  *          -   User
  *      parameters:
  *          -   in: header
- *              name: accesstoken
+ *              name: Authorization
  *              example: Bearer yourtoken
  *      responses:
  *          200:

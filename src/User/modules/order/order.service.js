@@ -92,7 +92,6 @@ class OrderService {
       resualt = await PharmacyOrderModel.create({
         orderId,
         pharmacyId: pharm[0],
-        priority: [pharm[1]],
       });
     else if (pharm.length == 2)
       resualt = await PharmacyOrderModel.create({
@@ -100,7 +99,7 @@ class OrderService {
         pharmacyId: pharm[0],
         priority: [pharm[1]],
       });
-    else if (pharm.length == 3)
+    else if (pharm.length >= 3)
       resualt = await PharmacyOrderModel.create({
         orderId,
         pharmacyId: pharm[0],
@@ -134,6 +133,8 @@ class OrderService {
     else if (pharm.priority.length == 0) {
       const order = await this.#model.findOne(pharm.orderId);
       order.status = "FAILED";
+      order.save();
+      const res = await PharmacyOrderModel.deleteOne({_id: pharm._id})
       throw createHttpError.NotAcceptable("سفارش شما پذیرفته نشد");
     }
     return resualt;
@@ -152,10 +153,11 @@ class OrderService {
     const data = await this.#pharmModel.find({
       "location.coordinates": {
         $geoWithin: {
-          $centerSphere: [cor, 2 / 6378.1],
+          $centerSphere: [cor, 10 / 6378.1],
         },
       },
     });
+    console.log(data,cor);
     return data;
   }
 }

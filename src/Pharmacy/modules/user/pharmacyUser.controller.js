@@ -29,8 +29,11 @@ class PharmacyUserController{
             const {userName} = req.pharmacyuser
             const data = req.body;
             await this.#service.findPharmacyUser(userName)
+            const coordinates = JSON.parse(data.coordinates)
+            data.coordinates = coordinates
+            console.log(data);
             deleteNulishObject(data)
-            const updateuserResualt = await this.#service.updatePharmacyUser({userName},data)
+            const updateuserResualt = await this.#service.updatePharmacyUser(userName,data)
             if(!updateuserResualt.modifiedCount) throw createHttpError.InternalServerError("به روزرسانی انجام نشد")
             return res.status(200).json({
                 statusCode: 200,

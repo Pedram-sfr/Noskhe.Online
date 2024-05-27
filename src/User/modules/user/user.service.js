@@ -16,7 +16,6 @@ class UserService{
     }
     
     async findUser(userId){
-        console.log(userId);
         // const user = await this.#model.findOne({mobile},{_id: 0,otp: 0,verfiedMobile:0,createdAt: 0,updatedAt:0,});
         const user = await this.#model.aggregate([
             {$match: {_id: new Types.ObjectId(userId)}},

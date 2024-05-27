@@ -3,35 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/style.css">
+    <style>
+        @font-face {
+            font-family: 'vazir';
+            src: url("./public/factor/Vazirmatn-Regular.ttf") format("ttf"),
+                    url("./public/factor/Vazirmatn-Regular.woff2") format("woff2")
+        }
+    </style>
 </head>
-<body>
+<body style="direction: rtl;font-family: vazir;align-items: center;justify-content: center;display: block;">
     <div style="max-width: 8cm; padding: 20px;">
         <div style="text-align: center;">
-            <img src="/factor/logo-type.png" style="width: 4cm;">
+            <img src="./public/factor/logo-type.png" style="width: 4cm;">
         </div>
         <div style="margin:0 -40px 0 -40px;">
             <ul style="list-style: none;">
-                <li style="font-size: 13px;font-weight: 700;"><span style=" font-weight: 300;font-size: 16px;">شماره فاکتور : </span><%=factor.invoiceId%></li>
-                <li style="font-size: 13px;font-weight: 700;"><span style=" font-weight: 300;font-size: 16px;">ساعت و تاریخ : </span><%=factor.time%> - <%=factor.date%></li>
-                <li style="font-size: 13px;font-weight: 700;"><span style=" font-weight: 300;font-size: 16px;">کاربر : </span>نسخه آنلاین | <%=factor.pharmacyName%></li>
+                <li style="font-size: 13px;font-weight: 700;"><span style=" font-weight: 300;font-size: 16px;">شماره فاکتور : </span>{{_id}}</li>
+                <li style="font-size: 13px;font-weight: 700;"><span style=" font-weight: 300;font-size: 16px;">ساعت و تاریخ : </span>{{time}} - {{date}}</li>
+                <li style="font-size: 13px;font-weight: 700;"><span style=" font-weight: 300;font-size: 16px;">کاربر : </span>نسخه آنلاین | {{pharmacyName}}</li>
             </ul>
         </div>
-        <% factor.elecPrescription.forEach(el=> { %>
+        {{#each elecPrescription}}
         <hr />
         <div style="margin:0 -40px 0 -40px;">
             <ul style="list-style: none;">
-                <%if (el.typeOfInsurance == "hcc") {%>
+                {{#ifCond this.typeOfInsurance "==" "hcc"}}
                     <li style="font-size: 13px;font-weight: 700;"><span style=" font-weight: 300;font-size: 16px;">نوع بیمه : </span>تامین اجتماعی</li>
-                    <%} else {%>
-                        <li style="font-size: 13px;font-weight: 700;"><span style=" font-weight: 300;font-size: 16px;">نوع بیمه : </spanبیمه سلامت</li>
-                <%}%>
-                <li style="font-size: 13px;font-weight: 700;"><span style=" font-weight: 300;font-size: 16px;">کدملی : </span><%=el.nationalCode%></li>
-                <li style="font-size: 13px;font-weight: 700;"><span style=" font-weight: 300;font-size: 16px;">کدرهگیری : </span><%=el.trackingCode%></li>
-                <li style="font-size: 13px;font-weight: 700;"><span style=" font-weight: 300;font-size: 16px;">نام دکتر : </span><%=el.doctorName%></li>
+                {{/ifCond}}
+                {{#ifCond this.typeOfInsurance "==" "thh"}}
+                        <li style="font-size: 13px;font-weight: 700;"><span style=" font-weight: 300;font-size: 16px;">نوع بیمه : </span>بیمه سلامت</li>
+                {{/ifCond}}
+                <li style="font-size: 13px;font-weight: 700;"><span style=" font-weight: 300;font-size: 16px;">کدملی : </span>{{this.nationalCode}}</li>
+                <li style="font-size: 13px;font-weight: 700;"><span style=" font-weight: 300;font-size: 16px;">کدرهگیری : </span>{{this.trackingCode}}</li>
+                <li style="font-size: 13px;font-weight: 700;"><span style=" font-weight: 300;font-size: 16px;">نام دکتر : </span>{{this.doctorName}}</li>
             </ul>
         </div>
-        <% }); %>
+        {{/each}}
         <hr />
         <div style="border: 1px solid #000;border-radius: 5px;">
             <table>
@@ -44,13 +51,13 @@
         </div>
         <div style="width: 100%; margin-top: 5px;">
             <table style="width: 100%;border: 1px solid #000;border-radius: 5px;border-bottom: none;">
-                <% for(let i=0; i<factor.drugs.length; i++) {%>
+                {{#each drugs}}
                     <tr style="text-align: center;">
                         <td style="width: 10%; border-left: 1px solid #000;border-bottom: 1px solid #000; font-size: 13px;font-weight: 500;"><%=i +1%></td>
-                        <td style="width: 80%; border-left: 1px solid #000;border-bottom: 1px solid #000;font-size: 13px;font-weight: 500;"><%=factor.drugs[i].drugName%> | <%=factor.drugs[i].drugType%> </td>
-                        <td style="width: 10%;font-size: 13px;border-bottom: 1px solid #000;font-weight: 500;"><%=factor.drugs[i].count%></td>
+                        <td style="width: 80%; border-left: 1px solid #000;border-bottom: 1px solid #000;font-size: 13px;font-weight: 500;">{{this.drugName}} | {{this.drugType}}</td>
+                        <td style="width: 10%;font-size: 13px;border-bottom: 1px solid #000;font-weight: 500;">{{count}}</td>
                     </tr>
-                <%}%>
+                {{/each}}
             </table>
         </div>
         <hr />
@@ -58,15 +65,15 @@
             <table style="width: 100%;">
                 <tr style="text-align: center;background-color: #DADADA;">
                     <td style="width: 40%; border-left: 1px solid #000;border-bottom: 1px solid #000;font-size: 14px;font-weight: 500;">وضعیت پرداخت : </td>
-                    <% if (factor.paymentStatus) { %>
+                    {{#if paymentStatus}}
                         <td style="width: 60%;font-size: 14px;border-bottom: 1px solid #000;font-weight: 700;">پرداخت آنلاین</td>
-                    <%} else {%>
+                    {{else}}
                         <td style="width: 60%;font-size: 14px;border-bottom: 1px solid #000;font-weight: 700;">پرداخت نشده است</td>
-                    <%}%>
+                   {{/if}}
                 </tr>
                 <tr style="text-align: center;background-color: #DADADA;">
                     <td style="width: 40%; border-left: 1px solid #000;font-size: 14px;font-weight: 500; ">مبلغ : </td>
-                    <td style="width: 60%;font-size: 14px;font-weight: 700;"><%=factor.totalPrice%> ریال</td>
+                    <td style="width: 60%;font-size: 14px;font-weight: 700;">{{totalPrice}} ریال</td>
                 </tr>
             </table>
         </div>

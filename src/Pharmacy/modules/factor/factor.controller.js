@@ -113,7 +113,7 @@ class FactorController {
           { "drugs.$": 1 }
         );
         if (drugf) {
-          if(parseInt(drugf.drugs[0].count) > parseInt(count)){
+          if (parseInt(drugf.drugs[0].count) > parseInt(count)) {
             await FactorModel.updateOne(
               { _id: factorId, "drugs.drugId": drugId },
               {
@@ -131,23 +131,22 @@ class FactorController {
                 },
               }
             );
-          }else if(parseInt(drugf.drugs[0].count) == parseInt(count)){
+          } else if (parseInt(drugf.drugs[0].count) == parseInt(count)) {
             await FactorModel.updateOne(
               { _id: factorId, "drugs.drugId": drugId },
               {
                 $pull: {
                   drugs: {
-                    _id: drugf.drugs[0]._id
+                    _id: drugf.drugs[0]._id,
                   },
                 },
               }
             );
-          }
-          else{
-            throw new createHttpError.InternalServerError()
+          } else {
+            throw new createHttpError.InternalServerError();
           }
         } else {
-          throw new createHttpError.NotFound()
+          throw new createHttpError.NotFound();
         }
       }
       factor.save();
@@ -306,7 +305,8 @@ class FactorController {
       const { date, time } = dateToJalali(factor?.createdAt);
       factor.time = time;
       factor.date = date;
-      //createPdf(factor)
+      
+      // createPdf(factor);
       return res.render("invoice.ejs", { factor });
     } catch (error) {
       next(error);

@@ -1,0 +1,8 @@
+@font-face {
+    font-family: 'vazir';
+    src: url("/factor/Vazirmatn-Regular.ttf") format("ttf"),
+            url("/factor/Vazirmatn-Regular.woff2") format("woff2")
+}
+body {
+    direction: rtl;font-family: vazir;align-items: center;justify-content: center;display: block;
+}

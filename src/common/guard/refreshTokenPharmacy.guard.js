@@ -6,7 +6,7 @@ require("dotenv").config();
 const RefreshTokenPharmacy = async (req,res,next)=>{
     try {
         const headers = req.headers;
-        const [bearer, token] = headers?.["accesstoken"]?.split(" ") || [];
+        const [bearer, token] = headers?.["authorization"]?.split(" ") || [];
         if(token && ["bearer","Bearer"].includes(bearer)){
             jwt.verify(token,process.env.JWT_REFRESHSECRET_KEY_PHARM,async (err,payload)=>{
                 if(err) return next(createHttpError.Unauthorized(AuthMessages.TokenIsInvalid))

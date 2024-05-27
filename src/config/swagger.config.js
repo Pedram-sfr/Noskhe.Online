@@ -9,7 +9,17 @@ function swaggerConfig(app) {
                 title: "Noskhe Online",
                 description: "online Pharmacy",
                 version: "0.0.1"
-            }
+            },
+            components:{
+                securitySchemes:{
+                    BearerAuth:{
+                        type: "http",
+                        scheme:"bearer",
+                        bearerFormat: "JWT"
+                    }
+                }
+            },
+            security:[{BearerAuth : []}]
         },
         apis: [process.cwd() + "/src/**/*.swagger.js"]
     })  

@@ -6,6 +6,7 @@ const NotFoundHandler = require("./src/common/exception/not-found.handler");
 const AllRouter = require("./src/app.routes");
 const path = require("path")
 const cors = require("cors")
+const { Cron } = require("croner")
 dotenv.config();
 async function main(){
     const app = express();
@@ -28,5 +29,13 @@ async function main(){
     app.listen(port, ()=>{
         console.log(`server: http://localhost:${port}`);
     })
+    // const job = Cron(
+    //     '0/5 * * * * *', //every 5 second
+    //     function(){
+    //         console.log("test cron");
+    //     },
+    //     {timezone: 'Asia/Tehran'}
+    // )
+    // console.log(job._states);
 }
 main();

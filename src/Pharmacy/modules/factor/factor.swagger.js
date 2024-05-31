@@ -16,6 +16,16 @@
  *              properties:
  *                  orderId:
  *                      type: string
+ *          CreatePersonFactor:
+ *              type: object
+ *              required:
+ *                  -   orderId
+ *                  -   deliveryTime
+ *              properties:
+ *                  orderId:
+ *                      type: string
+ *                  deliveryTime:
+ *                      type: number
  *          CreateDrugFactor:
  *              type: object
  *              required:
@@ -75,15 +85,46 @@
  */
 /**
  * @swagger
+ * /pharmacy/factor/invoiceList:
+ *  get:
+ *      summary: get invoice list
+ *      tags:
+ *          -   Pharmacy-Factor
+ *      parameters:
+ *          -   in: query
+ *              name: page
+ *              type: number
+ *          -   in: query
+ *              name: perpage
+ *              type: number
+ *      responses:
+ *          200:
+ *              description: success
+ *      
+ */
+/**
+ * @swagger
+ * /pharmacy/factor/invoice/{invoiceId}:
+ *  get:
+ *      summary: get invoice by invoiceId
+ *      tags:
+ *          -   Pharmacy-Factor
+ *      parameters:
+ *          -   in: path
+ *              name: invoiceId
+ *      responses:
+ *          200:
+ *              description: success
+ *      
+ */
+/**
+ * @swagger
  * /pharmacy/factor/orderList:
  *  get:
  *      summary: get order list
  *      tags:
  *          -   Pharmacy-Factor
  *      parameters:
- *          -   in: header
- *              name: accesstoken
- *              example: Bearer yourtoken
  *          -   in: query
  *              name: page
  *              type: number
@@ -99,13 +140,10 @@
  * @swagger
  * /pharmacy/factor/neworder/list:
  *  get:
- *      summary: get order list
+ *      summary: get new order list
  *      tags:
  *          -   Pharmacy-Factor
  *      parameters:
- *          -   in: header
- *              name: accesstoken
- *              example: Bearer yourtoken
  *          -   in: query
  *              name: page
  *              type: number
@@ -121,13 +159,10 @@
  * @swagger
  * /pharmacy/factor/order/notAccept/{id}:
  *  get:
- *      summary: get order list
+ *      summary: not accept order
  *      tags:
  *          -   Pharmacy-Factor
  *      parameters:
- *          -   in: header
- *              name: accesstoken
- *              example: Bearer yourtoken
  *          -   in: path
  *              name: id
  *      responses:
@@ -139,13 +174,9 @@
  * @swagger
  * /pharmacy/factor/order/Accept:
  *  post:
- *      summary: get order list
+ *      summary: accept order
  *      tags:
  *          -   Pharmacy-Factor
- *      parameters:
- *          -   in: header
- *              name: accesstoken
- *              example: Bearer yourtoken
  *      requestBody:
  *          content:
  *              application/x-www-form-urlencoded:
@@ -160,13 +191,10 @@
  * @swagger
  * /pharmacy/factor/order/{orderId}:
  *  get:
- *      summary: get order list
+ *      summary: get order by id
  *      tags:
  *          -   Pharmacy-Factor
  *      parameters:
- *          -   in: header
- *              name: accesstoken
- *              example: Bearer yourtoken
  *          -   in: path
  *              name: orderId
  *      responses:
@@ -176,15 +204,28 @@
  */
 /**
  * @swagger
- * /pharmacy/factor/create:
+ * /pharmacy/factor/createPerson:
  *  post:
- *      summary: get order list
+ *      summary: create person delivery invoice
  *      tags:
  *          -   Pharmacy-Factor
- *      parameters:
- *          -   in: header
- *              name: accesstoken
- *              example: Bearer yourtoken
+ *      requestBody:
+ *          content:
+ *              application/x-www-form-urlencoded:
+ *                  schema:
+ *                      $ref: "#/components/schemas/CreatePersonFactor"
+ *      responses:
+ *          200:
+ *              description: success
+ *      
+ */
+/**
+ * @swagger
+ * /pharmacy/factor/create:
+ *  post:
+ *      summary: create courier delivery invoice
+ *      tags:
+ *          -   Pharmacy-Factor
  *      requestBody:
  *          content:
  *              application/x-www-form-urlencoded:
@@ -199,13 +240,9 @@
  * @swagger
  * /pharmacy/factor/createDrug:
  *  post:
- *      summary: get order list
+ *      summary: create drug in invoice
  *      tags:
  *          -   Pharmacy-Factor
- *      parameters:
- *          -   in: header
- *              name: accesstoken
- *              example: Bearer yourtoken
  *      requestBody:
  *          content:
  *              application/x-www-form-urlencoded:
@@ -220,13 +257,9 @@
  * @swagger
  * /pharmacy/factor/removeDrug:
  *  patch:
- *      summary: get order list
+ *      summary: remove drug from  invoice
  *      tags:
  *          -   Pharmacy-Factor
- *      parameters:
- *          -   in: header
- *              name: accesstoken
- *              example: Bearer yourtoken
  *      requestBody:
  *          content:
  *              application/x-www-form-urlencoded:

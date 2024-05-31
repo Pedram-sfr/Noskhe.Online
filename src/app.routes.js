@@ -7,14 +7,15 @@ const { PharmacyAuthRouter } = require("./Pharmacy/modules/auth/pharmacyAuth.rou
 const { PharmacyUserRouter } = require("./Pharmacy/modules/user/pharmacyUser.routes");
 const { DrugRouter } = require("./Pharmacy/modules/drug/drug.routes");
 const { FactorRouter } = require("./Pharmacy/modules/factor/factor.routes");
+const { PaymentRouter } = require("./Payment/modules/user/payment.routes");
 
 const AllRouter = Router();
 
 AllRouter.use("/user/auth",AuthRouter);
 AllRouter.use("/user",UserARouter);
+AllRouter.use("/user",PaymentRouter);
 AllRouter.use("/user/order",OrderRouter);
 AllRouter.use("/user/address",AddressRouter);
-
 AllRouter.use("/pharmacy/auth",PharmacyAuthRouter);
 AllRouter.use("/pharmacy",PharmacyUserRouter);
 AllRouter.use("/pharmacy/drug",DrugRouter);

@@ -1,8 +1,10 @@
 /**
  * @swagger
  *  tags:
- *      name: User-Order
- *      description: UserOrder Routes
+ *      -   name: User-Order
+ *          description: UserOrder Routes
+ *      -   name: User-Order-Person
+ *          description: UserOrderPersonDelivery Routes
  */
 
 /**
@@ -17,6 +19,25 @@
  *                  addressId:
  *                      type: string
  *                  description:
+ *                      type: string
+ *          CreatePersonOrder:
+ *              type: object
+ *              required:
+ *                  -   addressId
+ *                  -   pharmacyId
+ *              properties:
+ *                  addressId:
+ *                      type: string
+ *                  pharmacyId:
+ *                      type: string
+ *                  description:
+ *                      type: string
+ *          PharmacyList:
+ *              type: object
+ *              required:
+ *                  -   addressId
+ *              properties:
+ *                  addressId:
  *                      type: string
  *          ElecPrescription:
  *              type: object
@@ -74,15 +95,60 @@
 
 /**
  * @swagger
+ * /user/order/person/pharmacyList:
+ *  post:
+ *      summary: pharmacy list around user address
+ *      tags:
+ *          -   User-Order-Person
+ *      requestBody:
+ *          content:
+ *              application/x-www-form-urlencoded:
+ *                  schema:
+ *                      $ref: "#/components/schemas/PharmacyList"
+ *      responses:
+ *          200:
+ *              description: success
+ *      
+ */
+/**
+ * @swagger
+ * /user/order/person/create:
+ *  post:
+ *      summary: create order for person delivery
+ *      tags:
+ *          -   User-Order-Person
+ *      requestBody:
+ *          content:
+ *              application/x-www-form-urlencoded:
+ *                  schema:
+ *                      $ref: "#/components/schemas/CreatePersonOrder"
+ *      responses:
+ *          200:
+ *              description: success
+ *      
+ */
+/**
+ * @swagger
+ * /user/order/invoice/{orderId}:
+ *  get:
+ *      summary: create order
+ *      tags:
+ *          -   User-Order
+ *      parameters:
+ *          -   in: path
+ *              name: orderId
+ *      responses:
+ *          200:
+ *              description: success
+ *      
+ */
+/**
+ * @swagger
  * /user/order/create:
  *  post:
  *      summary: create order
  *      tags:
  *          -   User-Order
- *      parameters:
- *          -   in: header
- *              name: accesstoken
- *              example: Bearer yourtoken
  *      requestBody:
  *          content:
  *              application/x-www-form-urlencoded:
@@ -100,10 +166,6 @@
  *      summary: add otc
  *      tags:
  *          -   User-Order
- *      parameters:
- *          -   in: header
- *              name: accesstoken
- *              example: Bearer yourtoken
  *      requestBody:
  *          content:
  *              multipart/form-data:
@@ -122,9 +184,6 @@
  *      tags:
  *          -   User-Order
  *      parameters:
- *          -   in: header
- *              name: accesstoken
- *              example: Bearer yourtoken
  *          -   in: query
  *              name: page
  *              type: number
@@ -144,9 +203,6 @@
  *      tags:
  *          -   User-Order
  *      parameters:
- *          -   in: header
- *              name: accesstoken
- *              example: Bearer yourtoken
  *          -   in: path
  *              name: orderId
  *      responses:
@@ -161,10 +217,6 @@
  *      summary: add UploadPrescription
  *      tags:
  *          -   User-Order
- *      parameters:
- *          -   in: header
- *              name: accesstoken
- *              example: Bearer yourtoken
  *      requestBody:
  *          content:
  *              multipart/form-data:
@@ -182,10 +234,6 @@
  *      summary: add elecPrescription
  *      tags:
  *          -   User-Order
- *      parameters:
- *          -   in: header
- *              name: accesstoken
- *              example: Bearer yourtoken
  *      requestBody:
  *          content:
  *              application/x-www-form-urlencoded:

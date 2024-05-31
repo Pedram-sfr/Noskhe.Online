@@ -94,8 +94,13 @@ class FactorService {
     console.log(total);
     return total;
   }
-  async findFactor(invoiceId) {
-    const factor = this.#model.findOne({ invoiceId });
+  async findFactor(invoiceId,pharmacyId) {
+    const factor = this.#model.findOne({ invoiceId , pharmacyId});
+    if (!factor) throw createHttpError.NotFound("یافت نشد");
+    return factor;
+  }
+  async findFactorList(pharmacyId) {
+    const factor = this.#model.find({ pharmacyId },{invoiceId: 1,createdAt: 1,status: 1,active: 1,deliveryType: 1,paymentStatus: 1});
     if (!factor) throw createHttpError.NotFound("یافت نشد");
     return factor;
   }

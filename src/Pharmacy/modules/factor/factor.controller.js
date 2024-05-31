@@ -21,6 +21,35 @@ class FactorController {
     autoBind(this);
     this.#service = FactorService;
   }
+  async createPersonDeliveryFactor(req, res, next) {
+    try {
+      const { userId: pharmacyId } = req.pharmacyuser;
+      const { orderId,deliveryTime } = req.body;
+      const order = await OrderModel.findById({ _id: orderId });
+      if (!order) throw new createHttpError.NotFound();
+      const data = {
+        invoiceId: codeGen(),
+        pharmacyId,
+        userId: order.userId,
+        orderId,
+        addressId: order.addressId,
+        deliveryTime,
+        deliveryType: 'PERSON'
+      };
+      const { _id: factorId } = await this.#service.createFactor(data);
+      order.status = "SUCCESS";
+      order.save();
+      return res.status(200).json({
+        statusCode: 200,
+        data: {
+          factorId,
+        },
+        error: null,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
   async createFactor(req, res, next) {
     try {
       const { userId: pharmacyId } = req.pharmacyuser;
@@ -36,6 +65,8 @@ class FactorController {
         shippingCost: 20000,
       };
       const { _id: factorId } = await this.#service.createFactor(data);
+      order.status = "SUCCESS";
+      order.save();
       return res.status(200).json({
         statusCode: 200,
         data: {
@@ -63,6 +94,8 @@ class FactorController {
       total = drugs.drugs[0].patient * count;
       if (action == "INCREMENT") {
         factor.totalPrice += total;
+        factor.insurancePrice += drugs.drugs[0].insurance * count;;
+        factor.price += drugs.drugs[0].price * count;;
         const drugf = await FactorModel.findOne(
           { _id: factorId, "drugs.drugId": drugId },
           { "drugs.$": 1 }
@@ -108,6 +141,8 @@ class FactorController {
       }
       if (action == "DECREMENT") {
         factor.totalPrice -= total;
+        factor.insurancePrice -= drugs.drugs[0].insurance * count;;
+        factor.price -= drugs.drugs[0].price * count;;
         const drugf = await FactorModel.findOne(
           { _id: factorId, "drugs.drugId": drugId },
           { "drugs.$": 1 }
@@ -176,7 +211,7 @@ class FactorController {
           drugs[i]
         );
       }
-      const factor = await this.#service.findFactor(invoiceId);
+      const factor = await this.#service.findFactor(invoiceId,userId);
       console.log(factor.drugs);
       if (factor.drugs.length == 0) {
         data = {
@@ -215,6 +250,36 @@ class FactorController {
         data: {
           message: "success",
         },
+        error: null,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+  async invoiceList(req, res, next) {
+    try {
+      const { userId } = req.pharmacyuser;
+      const pageNumber = parseInt(req.query.page || 1); // Get the current page number from the query parameters
+      const pageSize = parseInt(req.query.perpage || 10);
+      const order = await this.#service.findFactorList(userId);
+      const result = pagination(order, pageNumber, pageSize);
+      return res.status(200).json({
+        statusCode: 200,
+        result,
+        error: null,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+  async invoice(req, res, next) {
+    try {
+      const { userId } = req.pharmacyuser;
+      const { invoiceId } = req.params
+      const factor = await this.#service.findFactor(invoiceId,userId);
+      return res.status(200).json({
+        statusCode: 200,
+        factor,
         error: null,
       });
     } catch (error) {
@@ -267,7 +332,6 @@ class FactorController {
       if (!order) throw createHttpError.BadRequest();
       order.pharmId = userId;
       order.accepted = true;
-      order.status = "SUCCESS";
       order.save();
       await PharmacyOrderModel.deleteOne({ _id: po._id });
       return res.status(200).json({

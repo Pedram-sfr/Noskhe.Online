@@ -85,6 +85,13 @@ class OrderService {
     if (res.modifiedCount == 0) throw createHttpError.InternalServerError(data);
     return res;
   }
+  async addOrderToPerson(pharmacyId,orderId){
+    const result = await PharmacyOrderModel.create({
+      orderId,
+      pharmacyId
+    })
+    return result
+  }
   async addOrderToPharmacy(coordinate, orderId) {
     const pharm = await this.calDistanceCordinate(coordinate);
     let resualt;
@@ -153,12 +160,22 @@ class OrderService {
     const data = await this.#pharmModel.find({
       "location.coordinates": {
         $geoWithin: {
-          $centerSphere: [cor, 10 / 6378.1],
+          $centerSphere: [cor, 2 / 6378.1],
         },
       },
     });
     console.log(data,cor);
     return data;
+  }
+  async findPharmacyAroundUser(cor){
+    const data = await this.#pharmModel.find({
+      "location.coordinates": {
+        $geoWithin: {
+          $centerSphere: [cor, 10 / 6378.1],
+        },
+      },
+    },{address: 1,city: 1,province: 1,_id: 1,pharmacyName: 1});
+    return data
   }
 }
 

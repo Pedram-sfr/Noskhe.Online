@@ -1,7 +1,10 @@
 #پلتفرم داروخانه آنلاین نسخه
-
+##بخش کاربری
+```
+request method : get
+user/profile
+```
 ```bash
-`#000000`
 {
   data:{
       message: "ppp"

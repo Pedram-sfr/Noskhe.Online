@@ -1,6 +1,6 @@
 #پلتفرم داروخانه آنلاین نسخه
 
-```json
+```nodejs
 {
   data:{
       message: "ppp"

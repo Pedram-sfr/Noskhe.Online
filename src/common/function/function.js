@@ -4,7 +4,31 @@ const path = require("path");
 const ejs = require("ejs");
 const puppeteer = require("puppeteer");
 const { randomInt } = require("crypto");
+const { S3Client, DeleteObjectCommand } = require("@aws-sdk/client-s3");
+require("dotenv").config();
+async function deleteFileInPublicAWS(fileAddress){
+  console.log(fileAddress);
+  const client = new S3Client({
+      region: "default",
+    endpoint: process.env.LIARA_ENDPOINT,
+    credentials: {
+      accessKeyId: process.env.LIARA_ACCESS_KEY,
+      secretAccessKey: process.env.LIARA_SECRET_KEY
+    },
+  });
+  const params = {
+    Bucket: process.env.LIARA_BUCKET_NAME,
+    Key: fileAddress
+  };
 
+  // async/await
+  try {
+    await client.send(new DeleteObjectCommand(params));
+    console.log("File deleted successfully");
+  } catch (error) {
+    console.log(error);
+  }
+}
 const isTrue = (value) => ["true", 1, true].includes(value);
 const isFalse = (value) => ["false", 0, false].includes(value);
 function deleteFileInPublic(fileAddress) {
@@ -87,4 +111,5 @@ module.exports = {
   dateToJalali,
   createPdf,
   codeGen,
+  deleteFileInPublicAWS
 };

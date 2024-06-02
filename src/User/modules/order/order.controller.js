@@ -6,6 +6,7 @@ const UserModel = require("../user/user.model");
 const {
   deleteFileInPublic,
   isFalse,
+  deleteFileInPublicAWS,
 } = require("../../../common/function/function");
 const { log } = require("console");
 const OrderModel = require("./order.model");
@@ -184,12 +185,10 @@ class OrderController {
     try {
       const ordOTC = req.body;
       const { userId } = req.user;
-      if (ordOTC.fileUploadPath && ordOTC.filename) {
+      if (req.file.originalname) {
         console.log("1");
-        req.body.image = path
-          .join(ordOTC.fileUploadPath, ordOTC.filename)
-          .replace(/\\/gi, "/");
         const { orderId, count } = ordOTC;
+        req.body.image = req.file.originalname
         const image = req.body.image;
         await this.#service.addOTCImage(orderId, userId, image, count);
       } else {
@@ -205,7 +204,7 @@ class OrderController {
         error: null,
       });
     } catch (error) {
-      deleteFileInPublic(req.body?.image);
+      await deleteFileInPublicAWS(req.file?.key)
       next(error);
     }
   }
@@ -213,14 +212,15 @@ class OrderController {
     try {
       const ordup = req.body;
       const { userId } = req.user;
-      req.body.image = path
-        .join(ordup.fileUploadPath, ordup.filename)
-        .replace(/\\/gi, "/");
+      // req.body.image = path
+      //   .join(ordup.fileUploadPath, ordup.filename)
+      //   .replace(/\\/gi, "/");
+      req.body.image = req.file.originalname
       const { orderId } = ordup;
-      const data = {};
+      const datao = {};
       const image = req.body.image;
-      data.image = image;
-      await this.#service.addUploadPrescription(orderId, userId, data);
+      datao.image = image;
+      await this.#service.addUploadPrescription(orderId, userId, datao);
       return res.status(200).json({
         statusCode: 200,
         data: {
@@ -229,7 +229,7 @@ class OrderController {
         error: null,
       });
     } catch (error) {
-      deleteFileInPublic(req.body.image);
+      await deleteFileInPublicAWS(req.file.key)
       next(error);
     }
   }

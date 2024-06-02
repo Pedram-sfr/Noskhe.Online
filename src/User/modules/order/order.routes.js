@@ -1,6 +1,6 @@
 const Authorization = require("../../../common/guard/authorization.guard");
 const { stringToArray } = require("../../../common/middleware/stringToArray");
-const { uploadFile } = require("../../../common/utils/multer");
+const {  upload } = require("../../../common/utils/multer");
 const orderController = require("./order.controller");
 const {} = require("multer");
 
@@ -10,7 +10,7 @@ router.post("/person/pharmacyList", Authorization, orderController.pharmacyList)
 router.post(
   "/addOTC",
   Authorization,
-  uploadFile.single("image"),
+  upload.single('image'),
   orderController.addOTC
 );
 router.get("/list", Authorization, orderController.OrderList);
@@ -18,7 +18,7 @@ router.get("/:orderId", Authorization, orderController.OrderWithOrderId);
 router.post(
   "/uploadPrescription",
   Authorization,
-  uploadFile.single("image"),
+  upload.single('image'),
   orderController.addUploadPrescription
 );
 router.post(

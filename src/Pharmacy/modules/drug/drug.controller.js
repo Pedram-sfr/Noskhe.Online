@@ -3,7 +3,7 @@ const DrugService = require("./drug.service")
 const path = require("path")
 const autoBind = require("auto-bind");
 const createHttpError = require("http-errors");
-const { deleteNulishObject, excelToArray, deleteFileInPublic } = require("../../../common/function/function");
+const { deleteNulishObject, excelToArray, deleteFileInPublic, deleteFileInPublicAWS } = require("../../../common/function/function");
 const xlsx = require("xlsx")
 class DrugController{
     #service
@@ -17,13 +17,18 @@ class DrugController{
             const drugobj = req.body;
             const drug = await this.#service.findDrug(userId)
             if(drug) await this.#service.removeDrugList(userId);
-            req.body.excelFile = (path.join(drugobj.fileUploadPath,drugobj.filename)).replace(/\\/gi,"/");
+            // req.body.excelFile = (path.join(drugobj.fileUploadPath,drugobj.filename)).replace(/\\/gi,"/");
+            req.body.excelFile = req.file.location;
             const {excelFile} = req.body
-            const file = xlsx.readFile(`public/${excelFile}`);
+            const url = req.file.location;
+            const m = await (await fetch(url)).arrayBuffer();
+            /* data is an ArrayBuffer */
+            const file = xlsx.read(m);
+            // const file = xlsx.readFile(`public/${excelFile}`);
             const excel = Object.entries(file.Sheets.Sheet1)
             const data = excelToArray(excel)
             await this.#service.addDrug(userId,data)
-            deleteFileInPublic(req.body.excelFile)
+            await deleteFileInPublicAWS(req.file.key)
             return res.status(200).json({
                 statusCode: 200,
                 data: {

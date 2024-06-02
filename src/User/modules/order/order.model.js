@@ -32,10 +32,10 @@ const UploadPrescriptionSchema = new Schema({
     }
 })
 OTCSchema.virtual("imageUrl").get(function(){
-    return `${process.env.BASE_URL}:${process.env.APPLICATION_PORT}/${this.image}`
+    return `https://${process.env.LIARA_BUCKET_NAME}.${process.env.LIARA_ENDPOINT}/${this.image}`
 })
 UploadPrescriptionSchema.virtual("imageUrl").get(function(){
-    return `${process.env.BASE_URL}:${process.env.APPLICATION_PORT}/${this.image}`
+    return `https://${process.env.LIARA_BUCKET_NAME}.${process.env.LIARA_ENDPOINT}/${this.image}`
 })
 const OrderSchema = new Schema({
     userId : {type: Types.ObjectId, ref: "user", required: true},

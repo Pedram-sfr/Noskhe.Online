@@ -74,6 +74,13 @@
  *                      type: string
  *                  image:
  *                      type: file
+ *          Check:
+ *              type: object
+ *              required:
+ *                  -   addressId
+ *              properties:
+ *                  addressId:
+ *                      type: string
  *          List:
  *              type: object
  *              required:
@@ -144,6 +151,21 @@
  */
 /**
  * @swagger
+ * /user/order/check/{addressId}:
+ *  get:
+ *      summary: create order
+ *      tags:
+ *          -   User-Order
+ *      parameters:
+ *          -   in: path
+ *              name: addressId
+ *      responses:
+ *          200:
+ *              description: success
+ *      
+ */
+/**
+ * @swagger
  * /user/order/create:
  *  post:
  *      summary: create order
@@ -189,6 +211,9 @@
  *              type: number
  *          -   in: query
  *              name: perpage
+ *              type: number
+ *          -   in: query
+ *              name: search
  *              type: number
  *      responses:
  *          200:

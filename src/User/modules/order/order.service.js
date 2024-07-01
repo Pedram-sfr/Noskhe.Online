@@ -18,7 +18,7 @@ class OrderService {
     if (!res) throw createHttpError.InternalServerError("خطای سرور");
     return res;
   }
-  async addOTCImage(orderId, userId, image, count) {
+  async addOTCImage(orderId, userId, image, count,type) {
     const res = await this.#model.updateOne(
       { _id: orderId, userId },
       {
@@ -26,6 +26,7 @@ class OrderService {
           otc: {
             image,
             count,
+            type
           },
         },
       }
@@ -92,28 +93,35 @@ class OrderService {
     })
     return result
   }
-  async addOrderToPharmacy(coordinate, orderId) {
+  async addOrderToPharmacy(coordinate, orderId,refId) {
+    const order = await this.#model.findOne({_id: orderId});
     const pharm = await this.calDistanceCordinate(coordinate);
     let resualt;
     if (pharm.length == 1)
       resualt = await PharmacyOrderModel.create({
+        refId,
         orderId,
         pharmacyId: pharm[0],
       });
     else if (pharm.length == 2)
       resualt = await PharmacyOrderModel.create({
+        refId,
         orderId,
         pharmacyId: pharm[0],
         priority: [pharm[1]],
       });
     else if (pharm.length >= 3)
       resualt = await PharmacyOrderModel.create({
+        refId,
         orderId,
         pharmacyId: pharm[0],
         priority: [pharm[1], pharm[2]],
       });
-    else if (pharm.length == 0)
+    else if (pharm.length == 0){
+      order.status = "FAILED";
+      order.save();
       throw createHttpError.NotFound("داروخانه ای در محدوده شما یافت نشد");
+    }
     return resualt;
   }
   async notAcceptOrderToPharmacy(id) {
@@ -122,19 +130,19 @@ class OrderService {
     if (pharm.priority.length == 1)
       resualt = await PharmacyOrderModel.updateOne(
         { _id: id },
-        { pharmacyId: pharm.priority[0], priority: [] }
+        { pharmacyId: pharm.priority[0], priority: [],status: 'PENDING' }
       );
     else if (pharm.priority.length == 2)
       resualt = await PharmacyOrderModel.updateOne(
         { _id: id },
-        { pharmacyId: pharm.priority[0], priority: [pharm.priority[1]] }
+        { pharmacyId: pharm.priority[0], priority: [pharm.priority[1]],status: 'PENDING' }
       );
     else if (pharm.priority.length == 3)
       resualt = await PharmacyOrderModel.updateOne(
         { _id: id },
         {
           pharmacyId: pharm.priority[0],
-          priority: [pharm.priority[1], pharm.priority[2]],
+          priority: [pharm.priority[1], pharm.priority[2]],status: 'PENDING'
         }
       );
     else if (pharm.priority.length == 0) {
@@ -158,18 +166,17 @@ class OrderService {
     //     }}
     // ])
     const data = await this.#pharmModel.find({
-      "location.coordinates": {
+      "coordinates": {
         $geoWithin: {
           $centerSphere: [cor, 2 / 6378.1],
         },
       },
     });
-    console.log(data,cor);
     return data;
   }
   async findPharmacyAroundUser(cor){
     const data = await this.#pharmModel.find({
-      "location.coordinates": {
+      "coordinates": {
         $geoWithin: {
           $centerSphere: [cor, 10 / 6378.1],
         },

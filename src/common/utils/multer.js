@@ -118,8 +118,11 @@ const uploadExcel = multer({
     limits: { fileSize: maxSize },
     excelFilter,
   });
-
+const uploadexcel = multer({storage},excelFilter);
+const uploadimage = multer({storage},maxSize,fileFilter);
 module.exports = {
   uploadExcel,
   upload,
+  uploadimage,
+  uploadexcel
 };

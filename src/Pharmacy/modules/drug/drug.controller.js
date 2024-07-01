@@ -17,18 +17,13 @@ class DrugController{
             const drugobj = req.body;
             const drug = await this.#service.findDrug(userId)
             if(drug) await this.#service.removeDrugList(userId);
-            // req.body.excelFile = (path.join(drugobj.fileUploadPath,drugobj.filename)).replace(/\\/gi,"/");
-            req.body.excelFile = req.file.location;
+            req.body.excelFile = (path.join(drugobj.fileUploadPath,drugobj.filename)).replace(/\\/gi,"/");
             const {excelFile} = req.body
-            const url = req.file.location;
-            const m = await (await fetch(url)).arrayBuffer();
-            /* data is an ArrayBuffer */
-            const file = xlsx.read(m);
-            // const file = xlsx.readFile(`public/${excelFile}`);
+            const file = xlsx.readFile(`public/${excelFile}`);
             const excel = Object.entries(file.Sheets.Sheet1)
             const data = excelToArray(excel)
             await this.#service.addDrug(userId,data)
-            await deleteFileInPublicAWS(req.file.key)
+            deleteFileInPublic(req.body.excelFile)
             return res.status(200).json({
                 statusCode: 200,
                 data: {

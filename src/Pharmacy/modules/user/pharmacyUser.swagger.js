@@ -34,15 +34,23 @@
 
 /**
  * @swagger
+ * /pharmacy/dashboard:
+ *  get:
+ *      summary: get pharmacy dashboard
+ *      tags:
+ *          -   Pharmacy
+ *      responses:
+ *          200:
+ *              description: success
+ *      
+ */
+/**
+ * @swagger
  * /pharmacy/profile:
  *  get:
  *      summary: get user profile
  *      tags:
  *          -   Pharmacy
- *      parameters:
- *          -   in: header
- *              name: accesstoken
- *              example: Bearer yourtoken
  *      responses:
  *          200:
  *              description: success
@@ -55,10 +63,6 @@
  *      summary: get user profile
  *      tags:
  *          -   Pharmacy
- *      parameters:
- *          -   in: header
- *              name: accesstoken
- *              example: Bearer yourtoken
  *      responses:
  *          200:
  *              description: success
@@ -71,10 +75,6 @@
  *      summary: edit user profile
  *      tags:
  *          -   Pharmacy
- *      parameters:
- *          -   in: header
- *              name: accesstoken
- *              example: Bearer yourtoken
  *      requestBody:
  *          content:
  *              application/x-www-form-urlencoded:

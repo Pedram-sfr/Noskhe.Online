@@ -23,19 +23,18 @@ class FactorService {
     this.#orderModel = OrderModel;
   }
 
-  async orderListForPharmacy(pharmId) {
-    const order = await this.#orderModel
+  async orderListForPharmacy(pharmacyId) {
+    const order = await this.#model
       .find(
-        { pharmId },
+        { pharmacyId },
         {
           accepted: 0,
           uploadPrescription: 0,
           otc: 0,
-          pharmId: 0,
+          pharmacyId: 0,
           elecPrescription: 0,
           userId: 0,
           addressId: 0,
-          status: 0,
           updatedAt: 0,
         },
         {sort:{
@@ -46,11 +45,11 @@ class FactorService {
     if (!order) throw createHttpError.NotFound("لیست سفارشات خالی است");
     return order;
   }
-  async orderForPharmacy(pharmId, orderId) {
-    const order = await this.#orderModel
+  async orderForPharmacy(pharmacyId, orderId) {
+    const order = await this.#model
       .findOne(
-        { _id: orderId, pharmId },
-        { updatedAt: 0, status: 0, pharmId: 0, mobile: 0, fullName: 0 },
+        { orderId, pharmacyId },
+        { updatedAt: 0, pharmacyId: 0, mobile: 0, fullName: 0 ,addressId: 0},
         {sort: {
           _id: -1
         }}
@@ -58,8 +57,6 @@ class FactorService {
       .lean();
     if (!order && isFalse(order.accepted))
       throw createHttpError.NotFound("لیست سفارشات خالی است");
-    const { date, time } = dateToJalali(order.createdAt);
-    order["createdAt"] = { date, time };
     return order;
   }
   async createFactor(data) {
@@ -95,12 +92,12 @@ class FactorService {
     return total;
   }
   async findFactor(invoiceId,pharmacyId) {
-    const factor = this.#model.findOne({ invoiceId , pharmacyId});
+    const factor = this.#model.findOne({ invoiceId , pharmacyId, paymentStatus: true});
     if (!factor) throw createHttpError.NotFound("یافت نشد");
     return factor;
   }
   async findFactorList(pharmacyId) {
-    const factor = this.#model.find({ pharmacyId },{invoiceId: 1,createdAt: 1,status: 1,active: 1,deliveryType: 1,paymentStatus: 1});
+    const factor = this.#model.find({ pharmacyId,paymentStatus: true },{invoiceId: 1,createdAt: 1,status: 1,active: 1,deliveryType: 1,paymentStatus: 1});
     if (!factor) throw createHttpError.NotFound("یافت نشد");
     return factor;
   }
@@ -165,10 +162,16 @@ class FactorService {
       { priority: 0, updatedAt: 0 }
     ).lean();
     if (!data) throw createHttpError.BadRequest();
-    for (let i = 0; i < data.length; i++) {
-      const { date, time } = dateToJalali(data[i].createdAt);
-      data[i]["createdAt"] = { date, time };
-    }
+    return data;
+  }
+  async findNewOrderSingle(pharmacyId,orderId) {
+    const pod = await PharmacyOrderModel.findOne(
+      { pharmacyId,orderId },
+      { priority: 0, updatedAt: 0 }
+    ).lean();
+    if (!pod) throw createHttpError.BadRequest();
+    const data = await OrderModel.findOne({_id: orderId},{addressId: 0,mobile: 0,userId: 0,fullName:0, updatedAt: 0}).lean()
+    if(!data) throw createHttpError.NotFound();
     return data;
   }
 }

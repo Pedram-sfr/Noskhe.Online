@@ -31,8 +31,8 @@ class AuthService {
     await redisClient.set(String(mobile), code, { EX: 120 }, (err) => {
       if (err) return err.message;
     });
-    // const smstext = `کد احراز هویت شما در نسخه آنلاین: ${otp.code}`
-    // const {Status,ErrorCode,Success} = await sendSMS(smstext,mobile)
+    const smstext = `کد احراز هویت شما در نسخه آنلاین: ${code}`
+    const {Status,ErrorCode,Success} = await sendSMS(smstext,mobile)
     return code;
   }
   async sendLoginOTP(mobile) {
@@ -45,8 +45,8 @@ class AuthService {
     await redisClient.set(String(mobile), code, { EX: 120 }, (err) => {
       if (err) return err.message;
     });
-    // const smstext = `کد احراز هویت شما در نسخه آنلاین: ${otp.code}`
-    // const {Status,ErrorCode,Success} = await sendSMS(smstext,mobile)
+    const smstext = `کد احراز هویت شما در نسخه آنلاین: ${code}`
+    const {Status,ErrorCode,Success} = await sendSMS(smstext,mobile)
     return code;
   }
   async checkOTP(mobile, code) {

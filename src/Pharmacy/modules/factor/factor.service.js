@@ -37,9 +37,11 @@ class FactorService {
           addressId: 0,
           updatedAt: 0,
         },
-        {sort:{
-          _id: -1
-        }}
+        {
+          sort: {
+            _id: -1,
+          },
+        }
       )
       .lean();
     if (!order) throw createHttpError.NotFound("لیست سفارشات خالی است");
@@ -49,10 +51,12 @@ class FactorService {
     const order = await this.#model
       .findOne(
         { orderId, pharmacyId },
-        { updatedAt: 0, pharmacyId: 0, mobile: 0, fullName: 0 ,addressId: 0},
-        {sort: {
-          _id: -1
-        }}
+        { updatedAt: 0, pharmacyId: 0, mobile: 0, addressId: 0 },
+        {
+          sort: {
+            _id: -1,
+          },
+        }
       )
       .lean();
     if (!order && isFalse(order.accepted))
@@ -91,13 +95,27 @@ class FactorService {
     console.log(total);
     return total;
   }
-  async findFactor(invoiceId,pharmacyId) {
-    const factor = this.#model.findOne({ invoiceId , pharmacyId, paymentStatus: true});
+  async findFactor(invoiceId, pharmacyId) {
+    const factor = this.#model.findOne({
+      invoiceId,
+      pharmacyId,
+      paymentStatus: true,
+    });
     if (!factor) throw createHttpError.NotFound("یافت نشد");
     return factor;
   }
   async findFactorList(pharmacyId) {
-    const factor = this.#model.find({ pharmacyId,paymentStatus: true },{invoiceId: 1,createdAt: 1,status: 1,active: 1,deliveryType: 1,paymentStatus: 1});
+    const factor = this.#model.find(
+      { pharmacyId, paymentStatus: true },
+      {
+        invoiceId: 1,
+        createdAt: 1,
+        status: 1,
+        active: 1,
+        deliveryType: 1,
+        paymentStatus: 1,
+      }
+    );
     if (!factor) throw createHttpError.NotFound("یافت نشد");
     return factor;
   }
@@ -164,15 +182,56 @@ class FactorService {
     if (!data) throw createHttpError.BadRequest();
     return data;
   }
-  async findNewOrderSingle(pharmacyId,orderId) {
+  async findNewOrderSingle(pharmacyId, orderId) {
     const pod = await PharmacyOrderModel.findOne(
-      { pharmacyId,orderId },
+      { pharmacyId, orderId },
       { priority: 0, updatedAt: 0 }
     ).lean();
     if (!pod) throw createHttpError.BadRequest();
-    const data = await OrderModel.findOne({_id: orderId},{addressId: 0,mobile: 0,userId: 0,fullName:0, updatedAt: 0}).lean()
-    if(!data) throw createHttpError.NotFound();
+    const data = await OrderModel.findOne(
+      { _id: orderId },
+      { addressId: 0, mobile: 0, userId: 0, updatedAt: 0 }
+    ).lean();
+    if (!data) throw createHttpError.NotFound();
     return data;
+  }
+  async findOrdersWithStatus(pharmacyId, status, deliveryType) {
+    const order = await this.#model.find(
+      {pharmacyId,status,deliveryType},
+      {accepted: 0,
+      uploadPrescription: 0,
+      otc: 0,
+      pharmacyId: 0,
+      elecPrescription: 0,
+      userId: 0,
+      addressId: 0,
+      updatedAt: 0,},
+      {
+        sort:{
+          _id: -1
+        }
+      })
+    if (!order) throw createHttpError.NotFound(UserMessages.NotFound);
+    return order;
+  }
+  async findConfirmedOrders(pharmacyId, status) {
+    const order = await this.#model.find(
+      {pharmacyId,status},
+      {accepted: 0,
+      uploadPrescription: 0,
+      otc: 0,
+      pharmacyId: 0,
+      elecPrescription: 0,
+      userId: 0,
+      addressId: 0,
+      updatedAt: 0,},
+      {
+        sort:{
+          _id: -1
+        }
+      })
+    if (!order) throw createHttpError.NotFound(UserMessages.NotFound);
+    return order;
   }
 }
 

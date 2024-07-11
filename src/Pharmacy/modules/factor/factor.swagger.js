@@ -175,6 +175,82 @@
  */
 /**
  * @swagger
+ * /pharmacy/factor/orderList/confirmed:
+ *  get:
+ *      summary: get confirmed order list
+ *      tags:
+ *          -   Pharmacy-Factor
+ *      parameters:
+ *          -   in: query
+ *              name: page
+ *              type: number
+ *          -   in: query
+ *              name: perpage
+ *              type: number
+ *      responses:
+ *          200:
+ *              description: success
+ *      
+ */
+/**
+ * @swagger
+ * /pharmacy/factor/orderList/paid/wfc:
+ *  get:
+ *      summary: get wfc order list
+ *      tags:
+ *          -   Pharmacy-Factor
+ *      parameters:
+ *          -   in: query
+ *              name: page
+ *              type: number
+ *          -   in: query
+ *              name: perpage
+ *              type: number
+ *      responses:
+ *          200:
+ *              description: success
+ *      
+ */
+/**
+ * @swagger
+ * /pharmacy/factor/orderList/paid/person:
+ *  get:
+ *      summary: get current person order list
+ *      tags:
+ *          -   Pharmacy-Factor
+ *      parameters:
+ *          -   in: query
+ *              name: page
+ *              type: number
+ *          -   in: query
+ *              name: perpage
+ *              type: number
+ *      responses:
+ *          200:
+ *              description: success
+ *      
+ */
+/**
+ * @swagger
+ * /pharmacy/factor/orderList/paid/courier:
+ *  get:
+ *      summary: get current courier order list
+ *      tags:
+ *          -   Pharmacy-Factor
+ *      parameters:
+ *          -   in: query
+ *              name: page
+ *              type: number
+ *          -   in: query
+ *              name: perpage
+ *              type: number
+ *      responses:
+ *          200:
+ *              description: success
+ *      
+ */
+/**
+ * @swagger
  * /pharmacy/factor/neworder/list:
  *  get:
  *      summary: get new order list

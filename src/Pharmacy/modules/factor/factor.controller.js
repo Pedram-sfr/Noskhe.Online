@@ -302,6 +302,70 @@ class FactorController {
       next(error);
     }
   }
+  async currentPersonOrderList(req, res, next) {
+    try {
+      const { userId } = req.pharmacyuser;
+      const pageNumber = parseInt(req.query.page || 1); // Get the current page number from the query parameters
+      const pageSize = parseInt(req.query.perpage || 10);
+      const order = await this.#service.findOrdersWithStatus(userId,"PAID","PERSON");
+      const result = pagination(order, pageNumber, pageSize);
+      return res.status(200).json({
+        statusCode: 200,
+        result,
+        error: null,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+  async currentCourierOrderList(req, res, next) {
+    try {
+      const { userId } = req.pharmacyuser;
+      const pageNumber = parseInt(req.query.page || 1); // Get the current page number from the query parameters
+      const pageSize = parseInt(req.query.perpage || 10);
+      const order = await this.#service.findOrdersWithStatus(userId,"PAID","COURIER");
+      const result = pagination(order, pageNumber, pageSize);
+      return res.status(200).json({
+        statusCode: 200,
+        result,
+        error: null,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+  async WFCOrderList(req, res, next) {
+    try {
+      const { userId } = req.pharmacyuser;
+      const pageNumber = parseInt(req.query.page || 1); // Get the current page number from the query parameters
+      const pageSize = parseInt(req.query.perpage || 10);
+      const order = await this.#service.findOrdersWithStatus(userId,"WFC","COURIER");
+      const result = pagination(order, pageNumber, pageSize);
+      return res.status(200).json({
+        statusCode: 200,
+        result,
+        error: null,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+  async confirmedOrderList(req, res, next) {
+    try {
+      const { userId } = req.pharmacyuser;
+      const pageNumber = parseInt(req.query.page || 1); // Get the current page number from the query parameters
+      const pageSize = parseInt(req.query.perpage || 10);
+      const order = await this.#service.findConfirmedOrders(userId,"PENDING");
+      const result = pagination(order, pageNumber, pageSize);
+      return res.status(200).json({
+        statusCode: 200,
+        result,
+        error: null,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
   async order(req, res, next) {
     try {
       const { userId } = req.pharmacyuser;
@@ -362,6 +426,7 @@ class FactorController {
           userId: order.userId,
           orderId: order._id,
           addressId: order.addressId,
+          fullName: order.fullName,
           otc: order.otc,
           uploadPrescription: order.uploadPrescription,
           elecPrescription: order.elecPrescription,
@@ -376,6 +441,7 @@ class FactorController {
           orderId: order._id,
           addressId: order.addressId,
           shippingCost: 20000,
+          fullName: order.fullName,
           otc: order.otc,
           uploadPrescription: order.uploadPrescription,
           elecPrescription: order.elecPrescription,

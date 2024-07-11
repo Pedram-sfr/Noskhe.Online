@@ -81,6 +81,7 @@ const FactorSchema = new Schema(
     userId: { type: Types.ObjectId, required: true, ref: "user" },
     orderId: { type: Types.ObjectId, required: true, ref: "order" },
     addressId: { type: Types.ObjectId, required: true, ref: "address" },
+    fullName: {type: String,required: false},
     price: { type: Number, required: true, default: 0 },
     insurancePrice: { type: Number, required: true, default: 0 },
     totalPrice: { type: Number, required: true, default: 0 },
@@ -102,7 +103,7 @@ const FactorSchema = new Schema(
     status: {
       type: String,
       required: true,
-      enum: ["SENT", "PENDING", "FAILED", "PAID", "DELIVERED","WFC"],
+      enum: ["SEND", "PENDING", "FAILED", "PAID", "DELIVERED","WFC"],
       default: "PENDING",
     },
   },

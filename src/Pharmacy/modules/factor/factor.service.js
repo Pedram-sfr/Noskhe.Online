@@ -23,29 +23,55 @@ class FactorService {
     this.#orderModel = OrderModel;
   }
 
-  async orderListForPharmacy(pharmacyId) {
-    const order = await this.#model
-      .find(
-        { pharmacyId },
+  async orderListForPharmacy(pharmacyId,pageNumber, pageSize) {
+    // const order = await this.#model
+    //   .find(
+    //     { pharmacyId },
+    //     {
+    //       accepted: 0,
+    //       uploadPrescription: 0,
+    //       otc: 0,
+    //       pharmacyId: 0,
+    //       elecPrescription: 0,
+    //       userId: 0,
+    //       addressId: 0,
+    //       updatedAt: 0,
+    //     },
+    //     {
+    //       sort: {
+    //         _id: -1,
+    //       },
+    //     }
+    //   )
+    //   .lean();
+      const [{ total, data }] = await this.#model.aggregate([
         {
-          accepted: 0,
-          uploadPrescription: 0,
-          otc: 0,
-          pharmacyId: 0,
-          elecPrescription: 0,
-          userId: 0,
-          addressId: 0,
-          updatedAt: 0,
+          $match: { pharmacyId: new Types.ObjectId(pharmacyId) },
         },
         {
-          sort: {
-            _id: -1,
+          $facet: {
+            total: [{ $group: { _id: null, count: { $sum: 1 } } }],
+            data: [{ $skip: (pageNumber - 1) * pageSize }, { $limit: pageSize },{$project: {
+              accepted: 0,
+              uploadPrescription: 0,
+              otc: 0,
+              pharmacyId: 0,
+              elecPrescription: 0,
+              userId: 0,
+              addressId: 0,
+              updatedAt: 0,
+            }},{$sort: {_id: -1}}],
           },
-        }
-      )
-      .lean();
-    if (!order) throw createHttpError.NotFound("لیست سفارشات خالی است");
-    return order;
+        },
+        {
+          $project: {
+            total: "$total.count",
+            data: "$data",
+          },
+        },
+      ]);
+      if (!data) throw createHttpError.BadRequest();
+      return { total, data };
   }
   async orderForPharmacy(pharmacyId, orderId) {
     const order = await this.#model
@@ -174,13 +200,30 @@ class FactorService {
     ]);
     return factor;
   }
-  async findNewOrder(pharmacyId) {
-    const data = await PharmacyOrderModel.find(
-      { pharmacyId },
-      { priority: 0, updatedAt: 0 }
-    ).lean();
+  async findNewOrder(pharmacyId,pageNumber, pageSize) {
+    // const data = await PharmacyOrderModel.find(
+    //   { pharmacyId },
+    //   { priority: 0, updatedAt: 0 }
+    // );
+    const [{ total, data }] = await PharmacyOrderModel.aggregate([
+      {
+        $match: { pharmacyId: new Types.ObjectId(pharmacyId) },
+      },
+      {
+        $facet: {
+          total: [{ $group: { _id: null, count: { $sum: 1 } } }],
+          data: [{ $skip: (pageNumber - 1) * pageSize }, { $limit: pageSize },{$project: {priority: 0, updatedAt: 0}}],
+        },
+      },
+      {
+        $project: {
+          total: "$total.count",
+          data: "$data",
+        },
+      },
+    ]);
     if (!data) throw createHttpError.BadRequest();
-    return data;
+    return { total, data };
   }
   async findNewOrderSingle(pharmacyId, orderId) {
     const pod = await PharmacyOrderModel.findOne(
@@ -195,43 +238,105 @@ class FactorService {
     if (!data) throw createHttpError.NotFound();
     return data;
   }
-  async findOrdersWithStatus(pharmacyId, status, deliveryType) {
-    const order = await this.#model.find(
-      {pharmacyId,status,deliveryType},
-      {accepted: 0,
-      uploadPrescription: 0,
-      otc: 0,
-      pharmacyId: 0,
-      elecPrescription: 0,
-      userId: 0,
-      addressId: 0,
-      updatedAt: 0,},
+  async findOrdersWithStatus(pharmacyId, status, deliveryType,pageNumber, pageSize) {
+    // const order = await this.#model.find(
+    //   { pharmacyId, status, deliveryType },
+    //   {
+    //     accepted: 0,
+    //     uploadPrescription: 0,
+    //     otc: 0,
+    //     pharmacyId: 0,
+    //     elecPrescription: 0,
+    //     userId: 0,
+    //     addressId: 0,
+    //     updatedAt: 0,
+    //   },
+    //   {
+    //     sort: {
+    //       _id: -1,
+    //     },
+    //   }
+    // );
+    const [{ total, data }] = await this.#model.aggregate([
       {
-        sort:{
-          _id: -1
-        }
-      })
-    if (!order) throw createHttpError.NotFound(UserMessages.NotFound);
-    return order;
+        $match: { pharmacyId: new Types.ObjectId(pharmacyId),status, deliveryType },
+      },
+      {
+        $facet: {
+          total: [{ $group: { _id: null, count: { $sum: 1 } } }],
+          data: [{ $skip: (pageNumber - 1) * pageSize }, { $limit: pageSize },{$project: {
+            accepted: 0,
+            uploadPrescription: 0,
+            otc: 0,
+            pharmacyId: 0,
+            elecPrescription: 0,
+            userId: 0,
+            addressId: 0,
+            updatedAt: 0,
+          }},{$sort: {
+            _id: -1
+          }}],
+        },
+      },
+      {
+        $project: {
+          total: "$total.count",
+          data: "$data",
+        },
+      },
+    ]);
+    if (!data) throw createHttpError.BadRequest();
+    return { total, data };
   }
-  async findConfirmedOrders(pharmacyId, status) {
-    const order = await this.#model.find(
-      {pharmacyId,status},
-      {accepted: 0,
-      uploadPrescription: 0,
-      otc: 0,
-      pharmacyId: 0,
-      elecPrescription: 0,
-      userId: 0,
-      addressId: 0,
-      updatedAt: 0,},
+  async findConfirmedOrders(pharmacyId, status,pageNumber, pageSize) {
+    // const order = await this.#model.find(
+    //   { pharmacyId, status },
+    //   {
+    //     accepted: 0,
+    //     uploadPrescription: 0,
+    //     otc: 0,
+    //     pharmacyId: 0,
+    //     elecPrescription: 0,
+    //     userId: 0,
+    //     addressId: 0,
+    //     updatedAt: 0,
+    //   },
+    //   {
+    //     sort: {
+    //       _id: -1,
+    //     },
+    //   }
+    // );
+    const [{ total, data }] = await this.#model.aggregate([
       {
-        sort:{
-          _id: -1
-        }
-      })
-    if (!order) throw createHttpError.NotFound(UserMessages.NotFound);
-    return order;
+        $match: { pharmacyId: new Types.ObjectId(pharmacyId),status },
+      },
+      {
+        $facet: {
+          total: [{ $group: { _id: null, count: { $sum: 1 } } }],
+          data: [{ $skip: (pageNumber - 1) * pageSize }, { $limit: pageSize },{$project: {
+            accepted: 0,
+            uploadPrescription: 0,
+            otc: 0,
+            pharmacyId: 0,
+            elecPrescription: 0,
+            userId: 0,
+            addressId: 0,
+            updatedAt: 0,
+          }},{$sort: {
+            _id: -1
+          }}],
+        },
+      },
+      {
+        $project: {
+          total: "$total.count",
+          data: "$data",
+        },
+      },
+    ]);
+    if (!data) throw createHttpError.BadRequest();
+    return { total, data };
   }
 }
 

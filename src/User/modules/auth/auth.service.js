@@ -74,6 +74,11 @@ class AuthService {
     const newUser = await this.#model.create({mobile,fullName,nationalCode})
     const wallet = await findWalletByUserId(newUser?._id);
     if (isFalse(wallet)) await createWallet(newUser._id);
+    const walletnew = await findWalletByUserId(newUser?._id);
+    if (isFalse(walletnew)){
+      await this.#model.deleteOne({_id: newUser._id})
+      throw createHttpError.BadRequest();
+    } 
     const accessToken = this.signAccessToken({ mobile, userId: newUser._id });
     const refreshToken = this.signRefreshToken({ mobile, userId: newUser._id });
     return { accessToken, refreshToken };

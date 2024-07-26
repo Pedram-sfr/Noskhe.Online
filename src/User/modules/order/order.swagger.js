@@ -107,6 +107,13 @@
  *      summary: pharmacy list around user address
  *      tags:
  *          -   User-Order-Person
+ *      parameters:
+ *          -   in: query
+ *              name: page
+ *              type: number
+ *          -   in: query
+ *              name: perpage
+ *              type: number
  *      requestBody:
  *          content:
  *              application/x-www-form-urlencoded:
@@ -213,8 +220,6 @@
  *              name: perpage
  *              type: number
  *          -   in: query
- *              name: search
- *              type: number
  *      responses:
  *          200:
  *              description: success

@@ -20,6 +20,11 @@ class PharmacyAuthService{
         const newUser = await this.#model.create({mobile,userName,password: hashedPassword})
         if(isFalse(await findWalletByUserId(user?._id)))
             await createWallet(newUser._id);
+        if(isFalse(await findWalletByUserId(newUser?._id)))
+        {
+            await this.#model.deleteOne({_id: newUser._id});
+            throw new createHttpError.BadRequest(PharmacyAuthMessages.OTPCodeNotExpired)
+        }
         return newUser;
     }
     async login(userName,password){

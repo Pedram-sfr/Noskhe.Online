@@ -44,22 +44,34 @@ class UserService{
         if(!user) throw createHttpError.NotFound(UserMessages.NotFound)
         return user
     } 
-    async invoiceListForUser(userId){
-        const list = await this.#factorModel.aggregate([
-            {$match: {userId: new Types.ObjectId(userId)}},
+    async invoiceListForUser(userId,pageNumber,pageSize){
+        const [{ total, data }] = await this.#factorModel.aggregate([
             {
-                $project:{
-                    orderId: 0,
+              $match: { userId: new Types.ObjectId(userId),status: "DELIVERED" },
+            },
+            {
+              $facet: {
+                total: [{ $group: { _id: null, count: { $sum: 1 } } }],
+                data: [{ $skip: (pageNumber - 1) * pageSize }, { $limit: pageSize },{$project: {
                     pharmacyId: 0,
                     updatedAt: 0,
                     userId: 0,
                     addressId: 0,
                     drugs: 0
-                }
-            }]
-        )
-        if(!list) throw createHttpError.NotFound("یافت نشد")
-        return list
+                }},{$sort: {
+                  _id: -1
+                }}],
+              },
+            },
+            {
+              $project: {
+                total: "$total.count",
+                data: "$data",
+              },
+            },
+          ]);
+          if (!data) throw createHttpError.NotFound();
+          return { total, data };
     } 
     async invoiceForUser(id,userId){
         const list = await this.#factorModel.aggregate([

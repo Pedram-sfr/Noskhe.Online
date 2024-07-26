@@ -2,7 +2,7 @@ const { model, default: mongoose } = require("mongoose");
 const UserService = require("./user.service")
 const autoBind = require("auto-bind");
 const createHttpError = require("http-errors");
-const { dateToJalali } = require("../../../common/function/function");
+const { pagination } = require("../../../common/function/pagination");
 class UserController{
     #service
     constructor(){
@@ -45,17 +45,13 @@ class UserController{
     async invoiceList(req,res,next){
         try {
             const {userId} = req.user
-            const list = await this.#service.invoiceListForUser(userId)
-            for (let i = 0; i < list.length; i++) {
-                const {date,time} = dateToJalali(list[i].createdAt)
-                list[i].date = date;
-                list[i].time = time;
-            }
+            const pageNumber = parseInt(req.query.page || 1);
+            const pageSize = parseInt(req.query.perpage || 10);
+            const list = await this.#service.invoiceListForUser(userId,pageNumber,pageSize)
+            const result = pagination(list.data, pageNumber, pageSize,list.total[0]);
             return res.status(200).json({
                 statusCode: 200,
-                data: {
-                    list
-                },
+                result,
                 error: null
             })
         } catch (error) {
@@ -67,16 +63,9 @@ class UserController{
             const {userId} = req.user
             const {id} = req.params
             const invoice = await this.#service.invoiceForUser(id,userId)
-            for (let i = 0; i < invoice.length; i++) {
-                const {date,time} = dateToJalali(invoice[i].createdAt)
-                invoice[i].date = date;
-                invoice[i].time = time;
-            }
             return res.status(200).json({
                 statusCode: 200,
-                data: {
-                    invoice
-                },
+                invoice,
                 error: null
             })
         } catch (error) {

@@ -67,10 +67,6 @@
  *      summary: create new address
  *      tags:
  *          -   User-Address
- *      parameters:
- *          -   in: header
- *              name: accesstoken
- *              example: Bearer yourtoken
  *      requestBody:
  *          content:
  *              application/x-www-form-urlencoded:
@@ -88,10 +84,6 @@
  *      summary: edit new address
  *      tags:
  *          -   User-Address
- *      parameters:
- *          -   in: header
- *              name: accesstoken
- *              example: Bearer yourtoken
  *      requestBody:
  *          content:
  *              application/x-www-form-urlencoded:
@@ -110,9 +102,6 @@
  *      tags:
  *          -   User-Address
  *      parameters:
- *          -   in: header
- *              name: accesstoken
- *              example: Bearer yourtoken
  *          -   in: path
  *              name: addressId
  *      responses:
@@ -128,9 +117,12 @@
  *      tags:
  *          -   User-Address
  *      parameters:
- *          -   in: header
- *              name: accesstoken
- *              example: Bearer yourtoken
+ *          -   in: query
+ *              name: page
+ *              type: number
+ *          -   in: query
+ *              name: perpage
+ *              type: number
  *      responses:
  *          200:
  *              description: success

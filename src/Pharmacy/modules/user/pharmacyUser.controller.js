@@ -51,12 +51,11 @@ class PharmacyUserController {
   }
   async editProfile(req, res, next) {
     try {
-      const { userName } = req.pharmacyuser;
+      const { userId,userName } = req.pharmacyuser;
       const data = req.body;
-      await this.#service.findPharmacyUser(userName);
+      await this.#service.findPharmacyUser(userId);
       const coordinates = JSON.parse(data.coordinates);
       data.coordinates = coordinates;
-      console.log(data);
       deleteNulishObject(data);
       const updateuserResualt = await this.#service.updatePharmacyUser(
         userName,

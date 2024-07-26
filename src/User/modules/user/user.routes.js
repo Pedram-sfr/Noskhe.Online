@@ -6,6 +6,7 @@ const router = require("express").Router();
 
 router.get("/profile",Authorization,userController.profile)
 router.get("/wallet",Authorization,walletController.WalletForUser)
+router.patch("/wallet/sheba",Authorization,walletController.EditShebaForUser)
 router.get("/document/invoice",Authorization,userController.invoiceList)
 router.get("/document/invoice/:id",Authorization,userController.invoice)
 router.patch("/edit-profile",Authorization,userController.editProfile)

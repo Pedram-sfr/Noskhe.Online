@@ -93,6 +93,14 @@
  *                          -   COURIER
  *                  deliveryTime:
  *                      type: string
+ *          OrderList:
+ *              type: string
+ *              enum:
+ *                   -   ALL
+ *                   -   PERSON
+ *                   -   COURIER
+ *                   -   WFC
+ *                   -   CONFIRMED
  *          AcceptP:
  *              type: object
  *              required:
@@ -106,54 +114,6 @@
  *                  coordinates:
  *                      type: string
  */
-
-
-/**
- * @swagger
- * /pharmacy/factor/pdf:
- *  get:
- *      summary: get order list
- *      tags:
- *          -   Pharmacy-Factor
- *      responses:
- *          200:
- *              description: success
- *      
- */
-/**
- * @swagger
- * /pharmacy/factor/invoiceList:
- *  get:
- *      summary: get invoice list
- *      tags:
- *          -   Pharmacy-Factor
- *      parameters:
- *          -   in: query
- *              name: page
- *              type: number
- *          -   in: query
- *              name: perpage
- *              type: number
- *      responses:
- *          200:
- *              description: success
- *      
- */
-/**
- * @swagger
- * /pharmacy/factor/invoice/{invoiceId}:
- *  get:
- *      summary: get invoice by invoiceId
- *      tags:
- *          -   Pharmacy-Factor
- *      parameters:
- *          -   in: path
- *              name: invoiceId
- *      responses:
- *          200:
- *              description: success
- *      
- */
 /**
  * @swagger
  * /pharmacy/factor/orderList:
@@ -163,24 +123,9 @@
  *          -   Pharmacy-Factor
  *      parameters:
  *          -   in: query
- *              name: page
- *              type: number
- *          -   in: query
- *              name: perpage
- *              type: number
- *      responses:
- *          200:
- *              description: success
- *      
- */
-/**
- * @swagger
- * /pharmacy/factor/orderList/confirmed:
- *  get:
- *      summary: get confirmed order list
- *      tags:
- *          -   Pharmacy-Factor
- *      parameters:
+ *              name: list
+ *              schema:
+ *                  $ref: "#/components/schemas/OrderList"
  *          -   in: query
  *              name: page
  *              type: number
@@ -194,61 +139,95 @@
  */
 /**
  * @swagger
- * /pharmacy/factor/orderList/paid/wfc:
+ * /pharmacy/factor/order/{orderId}:
  *  get:
- *      summary: get wfc order list
+ *      summary: get order by id
  *      tags:
  *          -   Pharmacy-Factor
  *      parameters:
- *          -   in: query
- *              name: page
- *              type: number
- *          -   in: query
- *              name: perpage
- *              type: number
+ *          -   in: path
+ *              name: orderId
  *      responses:
  *          200:
  *              description: success
  *      
  */
-/**
- * @swagger
- * /pharmacy/factor/orderList/paid/person:
- *  get:
- *      summary: get current person order list
- *      tags:
- *          -   Pharmacy-Factor
- *      parameters:
- *          -   in: query
- *              name: page
- *              type: number
- *          -   in: query
- *              name: perpage
- *              type: number
- *      responses:
- *          200:
- *              description: success
- *      
- */
-/**
- * @swagger
- * /pharmacy/factor/orderList/paid/courier:
- *  get:
- *      summary: get current courier order list
- *      tags:
- *          -   Pharmacy-Factor
- *      parameters:
- *          -   in: query
- *              name: page
- *              type: number
- *          -   in: query
- *              name: perpage
- *              type: number
- *      responses:
- *          200:
- *              description: success
- *      
- */
+// /**
+//  * @swagger
+//  * /pharmacy/factor/orderList/confirmed:
+//  *  get:
+//  *      summary: get confirmed order list
+//  *      tags:
+//  *          -   Pharmacy-Factor
+//  *      parameters:
+//  *          -   in: query
+//  *              name: page
+//  *              type: number
+//  *          -   in: query
+//  *              name: perpage
+//  *              type: number
+//  *      responses:
+//  *          200:
+//  *              description: success
+//  *      
+//  */
+// /**
+//  * @swagger
+//  * /pharmacy/factor/orderList/paid/wfc:
+//  *  get:
+//  *      summary: get wfc order list
+//  *      tags:
+//  *          -   Pharmacy-Factor
+//  *      parameters:
+//  *          -   in: query
+//  *              name: page
+//  *              type: number
+//  *          -   in: query
+//  *              name: perpage
+//  *              type: number
+//  *      responses:
+//  *          200:
+//  *              description: success
+//  *      
+//  */
+// /**
+//  * @swagger
+//  * /pharmacy/factor/orderList/paid/person:
+//  *  get:
+//  *      summary: get current person order list
+//  *      tags:
+//  *          -   Pharmacy-Factor
+//  *      parameters:
+//  *          -   in: query
+//  *              name: page
+//  *              type: number
+//  *          -   in: query
+//  *              name: perpage
+//  *              type: number
+//  *      responses:
+//  *          200:
+//  *              description: success
+//  *      
+//  */
+// /**
+//  * @swagger
+//  * /pharmacy/factor/orderList/paid/courier:
+//  *  get:
+//  *      summary: get current courier order list
+//  *      tags:
+//  *          -   Pharmacy-Factor
+//  *      parameters:
+//  *          -   in: query
+//  *              name: page
+//  *              type: number
+//  *          -   in: query
+//  *              name: perpage
+//  *              type: number
+//  *      responses:
+//  *          200:
+//  *              description: success
+//  *      
+//  */
 /**
  * @swagger
  * /pharmacy/factor/neworder/list:
@@ -286,14 +265,14 @@
  */
 /**
  * @swagger
- * /pharmacy/factor/order/notAccept/{id}:
+ * /pharmacy/factor/order/notAccept/{orderId}:
  *  get:
  *      summary: not accept order
  *      tags:
  *          -   Pharmacy-Factor
  *      parameters:
  *          -   in: path
- *              name: id
+ *              name: orderId
  *      responses:
  *          200:
  *              description: success
@@ -333,21 +312,7 @@
  *              description: success
  *      
  */
-/**
- * @swagger
- * /pharmacy/factor/order/{orderId}:
- *  get:
- *      summary: get order by id
- *      tags:
- *          -   Pharmacy-Factor
- *      parameters:
- *          -   in: path
- *              name: orderId
- *      responses:
- *          200:
- *              description: success
- *      
- */
+
 /**
  * @swagger
  * /pharmacy/factor/order/price:

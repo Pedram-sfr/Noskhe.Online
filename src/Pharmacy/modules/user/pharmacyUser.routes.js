@@ -8,6 +8,7 @@ const router = require("express").Router();
 router.get("/dashboard",AuthorizationPharmacy,PharmacyUserController.dashboard)
 router.get("/profile",AuthorizationPharmacy,PharmacyUserController.profile)
 router.get("/wallet",AuthorizationPharmacy,walletController.WalletForPharmceyUser)
+router.patch("/wallet/sheba",AuthorizationPharmacy,walletController.EditShebaForPharmceyUser)
 router.patch("/edit-profile",AuthorizationPharmacy,PharmacyUserController.editProfile)
 module.exports = {
     PharmacyUserRouter: router

@@ -19,6 +19,16 @@
  *                      type: string
  *                  nationalCode:
  *                      type: string
+ *          EditWallet:
+ *              type: object
+ *              required:
+ *                  -   shebaName
+ *                  -   shebaNum
+ *              properties:
+ *                  shebaName:
+ *                      type: string
+ *                  shebaNum:
+ *                      type: string
  */
 
 /**
@@ -28,10 +38,6 @@
  *      summary: get user profile
  *      tags:
  *          -   User
- *      parameters:
- *          -   in: header
- *              name: Authorization
- *              example: Bearer yourtoken
  *      responses:
  *          200:
  *              description: success
@@ -45,9 +51,29 @@
  *      tags:
  *          -   User
  *      parameters:
- *          -   in: header
- *              name: accesstoken
- *              example: Bearer yourtoken
+ *          -   in: query
+ *              name: page
+ *              type: number
+ *          -   in: query
+ *              name: perpage
+ *              type: number
+ *      responses:
+ *          200:
+ *              description: success
+ *      
+ */
+/**
+ * @swagger
+ * /user/wallet/sheba:
+ *  patch:
+ *      summary: edit sheba wallet
+ *      tags:
+ *          -   User
+ *      requestBody:
+ *          content:
+ *              application/x-www-form-urlencoded:
+ *                  schema:
+ *                      $ref: "#/components/schemas/EditWallet"
  *      responses:
  *          200:
  *              description: success
@@ -60,10 +86,6 @@
  *      summary: edit user profile
  *      tags:
  *          -   User
- *      parameters:
- *          -   in: header
- *              name: accesstoken
- *              example: Bearer yourtoken
  *      requestBody:
  *          content:
  *              application/x-www-form-urlencoded:
@@ -83,9 +105,12 @@
  *      tags:
  *          -   User
  *      parameters:
- *          -   in: header
- *              name: accesstoken
- *              example: Bearer yourtoken
+ *          -   in: query
+ *              name: page
+ *              type: number
+ *          -   in: query
+ *              name: perpage
+ *              type: number
  *      responses:
  *          200:
  *              description: success
@@ -99,9 +124,6 @@
  *      tags:
  *          -   User
  *      parameters:
- *          -   in: header
- *              name: accesstoken
- *              example: Bearer yourtoken
  *          -   in: path
  *              name: id
  *      responses:

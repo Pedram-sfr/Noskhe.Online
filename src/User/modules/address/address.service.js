@@ -27,7 +27,8 @@ class AddressService{
         return await this.#model.findById(_id)
     }
     async findAddressByUserId(userId){
-        return await this.#model.find({userId},{updatedAt: 0,createdAt: 0,userId: 0},{sort: {_id: -1}})
+        return await this.#model.find({userId},{updatedAt: 0,createdAt: 0,userId: 0},{sort: {_id: -1}});
+        
     }
 }
 

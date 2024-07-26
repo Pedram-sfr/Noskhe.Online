@@ -5,6 +5,8 @@ const ejs = require("ejs");
 const puppeteer = require("puppeteer");
 const { randomInt } = require("crypto");
 const { S3Client, DeleteObjectCommand } = require("@aws-sdk/client-s3");
+const botService = require("../../Bot/user/bot.service");
+const OrderModel = require("../../User/modules/order/order.model");
 require("dotenv").config();
 async function deleteFileInPublicAWS(fileAddress){
   console.log(fileAddress);
@@ -102,6 +104,12 @@ function createPdf(factor) {
     await browser.close();
   });
 }
+
+async function sendMessgeWithBot(pharmacyId,orderId,refId) {
+  const user = await OrderModel.findById(orderId)
+  const res = await botService.sendMessage(pharmacyId,user.fullName,refId)
+  console.log(res);
+}
 module.exports = {
   isTrue,
   isFalse,
@@ -111,5 +119,6 @@ module.exports = {
   dateToJalali,
   createPdf,
   codeGen,
-  deleteFileInPublicAWS
+  deleteFileInPublicAWS,
+  sendMessgeWithBot
 };

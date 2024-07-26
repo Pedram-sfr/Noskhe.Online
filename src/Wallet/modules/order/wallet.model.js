@@ -15,7 +15,8 @@ const DetailSchema = new Schema({
 const WalletSchema = new Schema({
     userId : {type: Types.ObjectId, ref: "user" || "pharmacyUser", required: true,unique: true},
     cash: {type: Number,required: true,default: 0},
-    shebaNum: {type: String,required: false},
+    shebaNum: {type: String,required: true, default: ""},
+    shebaName: {type: String,required: true, default: ""},
     detail: {type: [DetailSchema],required: false},
 },{timestamps: true,versionKey:0,toJSON:{
     virtuals: true

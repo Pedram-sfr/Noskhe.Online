@@ -30,6 +30,16 @@
  *                      type: string
  *                  coordinates:
  *                      type: string
+ *          EditWallet:
+ *              type: object
+ *              required:
+ *                  -   shebaName
+ *                  -   shebaNum
+ *              properties:
+ *                  shebaName:
+ *                      type: string
+ *                  shebaNum:
+ *                      type: string
  */
 
 /**
@@ -63,6 +73,30 @@
  *      summary: get user profile
  *      tags:
  *          -   Pharmacy
+ *      parameters:
+ *          -   in: query
+ *              name: page
+ *              type: number
+ *          -   in: query
+ *              name: perpage
+ *              type: number
+ *      responses:
+ *          200:
+ *              description: success
+ *      
+ */
+/**
+ * @swagger
+ * /pharmacy/wallet/sheba:
+ *  patch:
+ *      summary: edit sheba wallet
+ *      tags:
+ *          -   Pharmacy
+ *      requestBody:
+ *          content:
+ *              application/x-www-form-urlencoded:
+ *                  schema:
+ *                      $ref: "#/components/schemas/EditWallet"
  *      responses:
  *          200:
  *              description: success

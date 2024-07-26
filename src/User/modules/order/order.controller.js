@@ -28,12 +28,14 @@ class OrderController {
     try {
       const { userId } = req.user;
       const { addressId } = req.body;
-      console.log(userId, addressId);
+      const pageNumber = parseInt(req.query.page || 1); // Get the current page number from the query parameters
+      const pageSize = parseInt(req.query.perpage || 10);
       const address = await AddressModel.findOne({ _id: addressId, userId });
       if (!address) throw createHttpError.NotFound("آدرس یافت نشد");
-      const result = await this.#service.findPharmacyAroundUser(
-        address.coordinate
+      const data = await this.#service.findPharmacyAroundUser(
+        address.coordinate,pageNumber,pageSize
       );
+      const result = pagination(data.data, pageNumber, pageSize,data.total[0]);
       return res.status(200).json({
         statusCode: 200,
         result,
@@ -47,12 +49,13 @@ class OrderController {
     try {
       const { userId } = req.user;
       const { description, addressId, pharmacyId } = req.body;
-      let resualt;
+      let result;
       const user = await UserModel.findById({ _id: userId });
       if (!user) throw createHttpError.NotFound("کاربر یافت نشد");
       const address = await AddressModel.findOne({ _id: addressId, userId });
       if (!address) throw createHttpError.NotFound("آدرس یافت نشد");
-      resualt = await this.#service.createOrder({
+      result = await this.#service.createOrder({
+        refId: codeGen(),
         userId,
         mobile: user.mobile,
         description,
@@ -60,11 +63,11 @@ class OrderController {
         fullName: user.fullName,
         deliveryType: "PERSON",
       });
-      await this.#service.addOrderToPerson(pharmacyId, resualt._id);
+      await this.#service.addOrderToPerson(pharmacyId, result._id,result.refId);
       return res.status(200).json({
         statusCode: 200,
         data: {
-          orderId: resualt._id,
+          orderId: result._id,
         },
         error: null,
       });
@@ -153,43 +156,71 @@ class OrderController {
   async OrderList(req, res, next) {
     try {
       const { userId } = req.user;
-      const search = req.query.search;
+      // const search = req.query.search;
       const pageNumber = parseInt(req.query.page || 1);
       const pageSize = parseInt(req.query.perpage || 10);
-      let order;
-      if (search) {
-        order = await OrderModel.find(
-          { userId, refId: search },
-          {
-            updatedAt: 0,
-            otc: 0,
-            uploadPrescription: 0,
-            elecPrescription: 0,
-            pharmId: 0,
-            addressId: 0,
-            mobile: 0,
-            fullName: 0,
+      // let order;
+      // if (search) {
+      //   order = await OrderModel.find(
+      //     { userId, refId: search },
+      //     {
+      //       updatedAt: 0,
+      //       otc: 0,
+      //       uploadPrescription: 0,
+      //       elecPrescription: 0,
+      //       pharmId: 0,
+      //       addressId: 0,
+      //       mobile: 0,
+      //       fullName: 0,
+      //     },
+      //     { sort: { _id: -1 } }
+      //   );
+      // } else {
+      //   order = await OrderModel.find(
+      //     { userId },
+      //     {
+      //       updatedAt: 0,
+      //       otc: 0,
+      //       uploadPrescription: 0,
+      //       elecPrescription: 0,
+      //       pharmId: 0,
+      //       addressId: 0,
+      //       mobile: 0,
+      //       fullName: 0,
+      //     },
+      //     { sort: { _id: -1 } }
+      //   ).lean();
+      // }
+      const [{ total, data }] = await OrderModel.aggregate([
+        {
+          $match: { userId: new Types.ObjectId(userId) },
+        },
+        {
+          $facet: {
+            total: [{ $group: { _id: null, count: { $sum: 1 } } }],
+            data: [{ $skip: (pageNumber - 1) * pageSize }, { $limit: pageSize },{$project: {
+              updatedAt: 0,
+              otc: 0,
+              uploadPrescription: 0,
+              elecPrescription: 0,
+              pharmId: 0,
+              addressId: 0,
+              mobile: 0,
+              fullName: 0,
+            }},{$sort: {
+              _id: -1
+            }}],
           },
-          { sort: { _id: -1 } }
-        ).lean();
-      } else {
-        order = await OrderModel.find(
-          { userId },
-          {
-            updatedAt: 0,
-            otc: 0,
-            uploadPrescription: 0,
-            elecPrescription: 0,
-            pharmId: 0,
-            addressId: 0,
-            mobile: 0,
-            fullName: 0,
+        },
+        {
+          $project: {
+            total: "$total.count",
+            data: "$data",
           },
-          { sort: { _id: -1 } }
-        ).lean();
-      }
-      if (!order) throw createHttpError.NotFound("بافت نشد");
-      const result = pagination(order, pageNumber, pageSize);
+        },
+      ]);
+      if (!data) throw createHttpError.NotFound("بافت نشد");
+      const result = pagination(data, pageNumber, pageSize,total[0]);
       return res.status(200).json({
         statusCode: 200,
         result,
@@ -230,12 +261,12 @@ class OrderController {
     try {
       const { userId } = req.user;
       const { description, addressId } = req.body;
-      let resualt;
+      let result;
       const user = await UserModel.findById({ _id: userId });
       if (!user) throw createHttpError.NotFound("کاربر یافت نشد");
       const address = await AddressModel.findOne({ _id: addressId, userId });
       if (!address) throw createHttpError.NotFound("آدرس یافت نشد");
-      resualt = await this.#service.createOrder({
+      result = await this.#service.createOrder({
         refId: codeGen(),
         userId,
         mobile: user.mobile,
@@ -243,11 +274,11 @@ class OrderController {
         addressId,
         fullName: user.fullName,
       });
-      await this.#service.addOrderToPharmacy(address.coordinate, resualt._id,resualt.refId);
+      await this.#service.addOrderToPharmacy(address.coordinate, result._id,result.refId);
       return res.status(200).json({
         statusCode: 200,
         data: {
-          orderId: resualt._id,
+          orderId: result._id,
         },
         error: null,
       });
@@ -363,11 +394,11 @@ class OrderController {
       const { userId } = req.pharmacyuser;
       console.log(id);
       const otpd = await PharmacyOrderModel.findOne({
-        _id: id,
+        orderId: id,
         pharmacyId: userId,
       });
       if (!otpd) throw createHttpError.NotFound("سفارش یافت نشد");
-      await this.#service.notAcceptOrderToPharmacy(id);
+      await this.#service.notAcceptOrderToPharmacy(otpd._id);
       return res.status(200).json({
         statusCode: 200,
         data: {

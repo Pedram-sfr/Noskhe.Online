@@ -20,7 +20,7 @@ class PaymentController{
         try {
             const { userId } = req.user;
             const { invoiceId } = req.body;
-            const factor = await FactorModel.findOne({invoiceId,userId})
+            const factor = await FactorModel.findOne({_id: invoiceId,userId})
             if(!factor) throw createHttpError.NotFound();
             let data = {}
             if(factor.paymentStatus == false){

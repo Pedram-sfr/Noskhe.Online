@@ -414,11 +414,11 @@ class FactorController {
   async order(req, res, next) {
     try {
       const { userId } = req.pharmacyuser;
-      const { orderId } = req.params;
-      const order = await this.#service.orderForPharmacy(userId, orderId);
+      const { factorId } = req.params;
+      const data = await this.#service.orderForPharmacy(userId, factorId);
       return res.status(200).json({
         statusCode: 200,
-        order,
+        data,
         error: null,
       });
     } catch (error) {
@@ -545,6 +545,50 @@ class FactorController {
       next(error);
     }
   }
+  async acceptPrice(req, res, next) {
+    try {
+      const { userId } = req.pharmacyuser;
+      const { invoiceId } = req.body;
+      const invoice = await FactorModel.findOne({_id: invoiceId, pharmacyId: userId});
+      let price= 0 ,totalPrice = 0, insurance = 0;
+      const otc = invoice.otc;
+      const upload = invoice.uploadPrescription;
+      const elec = invoice.elecPrescription;
+      if (otc.length > 0) {
+        for (let i = 0; i < otc.length; i++) {
+          price += parseInt(otc[i].price);
+          totalPrice += parseInt(otc[i].total);
+        }
+      } 
+      if (upload.length > 0) {
+        for (let i = 0; i < upload.length; i++) {
+          price += parseInt(upload[i].price);
+          insurance += parseInt(upload[i].insurance);
+          totalPrice = totalPrice + (parseInt(upload[i].price) - parseInt(upload[i].insurance));
+        }
+      } 
+      if (elec.length > 0) {
+        for (let i = 0; i < elec.length; i++) {
+          price += parseInt(elec[i].price);
+          insurance += parseInt(elec[i].insurance);
+          totalPrice = totalPrice + (parseInt(elec[i].price) - parseInt(elec[i].insurance));
+        }
+      } 
+      invoice.price = price;
+      invoice.insurancePrice = insurance;
+      invoice.totalPrice = totalPrice;
+      invoice.save();
+      return res.status(200).json({
+        statusCode: 200,
+        data: {
+          message: "ok",
+        },
+        error: null,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
   async addPriceToFactor(req, res, next) {
     try {
       const { userId } = req.pharmacyuser;
@@ -598,8 +642,9 @@ class FactorController {
           throw createHttpError.InternalServerError(
             "Nok"
           );
-        invoice.price += parseInt(price);
-        invoice.totalPrice += parseInt(price);
+        invoice.price = parseInt(invoice.price) + parseInt(price);
+        invoice.totalPrice = parseInt(invoice.totalPrice) + parseInt(price);
+        console.log("1 --> ",invoice.price,invoice.totalPrice );
         invoice.save();
       } 
       else if (itemType == "UPLOAD") {
@@ -633,9 +678,11 @@ class FactorController {
           throw createHttpError.InternalServerError(
             "Nok"
           );
-        invoice.price += parseInt(price);
-        invoice.insurancePrice += parseInt(insurance);
-        invoice.totalPrice += parseInt(price) - parseInt(insurance);
+          console.log(price,insurance,data);
+        invoice.price = parseInt(invoice.price) + parseInt(price);
+        invoice.insurancePrice = parseInt(invoice.insurancePrice) + parseInt(insurance || 0);
+        invoice.totalPrice = parseInt(invoice.totalPrice) + (parseInt(price) - parseInt(insurance || 0));
+        console.log("2 --> ",invoice.price,invoice.insurancePrice,invoice.totalPrice );
         invoice.save();
       } 
       else if (itemType == "ELEC") {
@@ -672,11 +719,13 @@ class FactorController {
           throw createHttpError.InternalServerError(
             "Nok"
           );
-        invoice.price += parseInt(price);
-        invoice.insurancePrice += parseInt(insurance);
-        invoice.totalPrice += parseInt(price) - parseInt(insurance);
+        invoice.price = parseInt(invoice.price) + parseInt(price);
+        invoice.insurancePrice = parseInt(invoice.insurancePrice) + parseInt(insurance);
+        invoice.totalPrice = parseInt(invoice.totalPrice) + parseInt(price) - parseInt(insurance);
+        console.log("3 --> ",invoice.price,invoice.insurancePrice,invoice.totalPrice );
         invoice.save();
       }
+      else throw new createHttpError.BadRequest()
       if (data.modifiedCount == 0)
         throw createHttpError.InternalServerError(
           "Nok"

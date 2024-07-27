@@ -68,6 +68,13 @@
  *                      type: number
  *                  insurance:
  *                      type: number
+ *          AcceptPrice:
+ *              type: object
+ *              required:
+ *                  -   invoiceId
+ *              properties:
+ *                  invoiceId:
+ *                      type: string
  *          removeDrug:
  *              type: object
  *              required:
@@ -139,14 +146,14 @@
  */
 /**
  * @swagger
- * /pharmacy/factor/order/{orderId}:
+ * /pharmacy/factor/order/{factorId}:
  *  get:
  *      summary: get order by id
  *      tags:
  *          -   Pharmacy-Factor
  *      parameters:
  *          -   in: path
- *              name: orderId
+ *              name: factorId
  *      responses:
  *          200:
  *              description: success
@@ -325,6 +332,23 @@
  *              application/x-www-form-urlencoded:
  *                  schema:
  *                      $ref: "#/components/schemas/Price"
+ *      responses:
+ *          200:
+ *              description: success
+ *      
+ */
+/**
+ * @swagger
+ * /pharmacy/factor/order/acceptPrice:
+ *  patch:
+ *      summary: accept price in invoice item
+ *      tags:
+ *          -   Pharmacy-Factor
+ *      requestBody:
+ *          content:
+ *              application/x-www-form-urlencoded:
+ *                  schema:
+ *                      $ref: "#/components/schemas/AcceptPrice"
  *      responses:
  *          200:
  *              description: success

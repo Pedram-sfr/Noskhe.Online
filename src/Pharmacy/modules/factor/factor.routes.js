@@ -19,12 +19,13 @@ router.get("/orderList/confirmed",AuthorizationPharmacy,FactorController.confirm
 router.get("/orderList/paid/wfc",AuthorizationPharmacy,FactorController.WFCOrderList)
 router.get("/orderList/paid/courier",AuthorizationPharmacy,FactorController.currentCourierOrderList)
 router.get("/orderList/paid/person",AuthorizationPharmacy,FactorController.currentPersonOrderList)
-router.get("/order/:orderId",AuthorizationPharmacy,FactorController.order)
+router.get("/order/:factorId",AuthorizationPharmacy,FactorController.order)
 router.post("/create",AuthorizationPharmacy,FactorController.createFactor)
 router.post("/createPerson",AuthorizationPharmacy,FactorController.createPersonDeliveryFactor)
 router.post("/createDrug",AuthorizationPharmacy,FactorController.drugFactor)
 router.patch("/removeDrug",AuthorizationPharmacy,FactorController.removeDrugFromFactor)
 router.patch("/order/price",AuthorizationPharmacy,FactorController.addPriceToFactor)
+router.patch("/order/acceptPrice",AuthorizationPharmacy,FactorController.acceptPrice)
 module.exports = {
     FactorRouter: router
 }

@@ -80,7 +80,7 @@ class OrderController {
       const { userId } = req.user;
       const { orderId } = req.params;
       const delivery = {};
-      const invoice = {};
+      const data = {};
       const order = await OrderModel.findOne(
         { userId, _id: orderId },
         { deliveryType: 1, status: 1, addressId: 1 }
@@ -109,8 +109,8 @@ class OrderController {
           delivery["deleverTo"] = del.address;
           delivery.deleveryType = factor.deliveryType;
         }
-        invoice.delivery = delivery;
-        invoice.payment = {};
+        data.delivery = delivery;
+        data.payment = {};
       } else if (factor.status == "PAID") {
         const payment = {};
         const pay = await PaymentModel.findOne({ _id: factor.paymentCode });
@@ -122,8 +122,8 @@ class OrderController {
         delivery.deliveryTime = pay.deliveryTime;
         delivery.deliveryDate = pay.deliveryDate;
         delivery.deliveryCode = pay.deliveryCode;
-        invoice.payment = payment;
-        invoice.delivery = delivery;
+        data.payment = payment;
+        data.delivery = delivery;
       }
       const d = await FactorModel.findOne(
         { userId, orderId },
@@ -143,10 +143,10 @@ class OrderController {
         }
       );
 
-      invoice.detail = d;
+      data.detail = d;
       return res.status(200).json({
         statusCode: 200,
-        invoice,
+        data,
         error: null,
       });
     } catch (error) {
@@ -240,9 +240,10 @@ class OrderController {
       if (order.deliveryType == "COURIER") {
         address = await AddressModel.findById(order.addressId);
       } else if (order.deliveryType == "PERSON") {
-        const { address } = await PharmacyUserModel.findById(order.pharmId, {
-          address: 1,
+        const { pharmacyId } = await PharmacyOrderModel.findOne({orderId: order._id}, {
+          pharmacyId: 1,
         });
+        const { address } = await PharmacyUserModel.findById(pharmacyId);
         order["address"] = address;
       }
       return res.status(200).json({

@@ -73,20 +73,15 @@ class FactorService {
       if (!data) throw createHttpError.BadRequest();
       return { total, data };
   }
-  async orderForPharmacy(pharmacyId, orderId) {
+  async orderForPharmacy(pharmacyId, factorId) {
     const order = await this.#model
       .findOne(
-        { orderId, pharmacyId },
+        { _id: factorId, pharmacyId },
         { updatedAt: 0, pharmacyId: 0, mobile: 0, addressId: 0 },
-        {
-          sort: {
-            _id: -1,
-          },
-        }
       )
       .lean();
     if (!order && isFalse(order.accepted))
-      throw createHttpError.NotFound("لیست سفارشات خالی است");
+      throw createHttpError.NotFound();
     return order;
   }
   async createFactor(data) {
@@ -209,10 +204,27 @@ class FactorService {
       {
         $match: { pharmacyId: new Types.ObjectId(pharmacyId) },
       },
+      {$lookup: {
+        from: "orders",
+        foreignField: "_id",
+        localField: "orderId",
+        as: "order"
+      }},
+      {
+          $unwind: {
+              path: "$order",
+              preserveNullAndEmptyArrays: true
+          }
+      },
+      {
+        $addFields: {
+            deliveryType: "$order.deliveryType",
+        }
+      },
       {
         $facet: {
           total: [{ $group: { _id: null, count: { $sum: 1 } } }],
-          data: [{ $skip: (pageNumber - 1) * pageSize }, { $limit: pageSize },{$project: {priority: 0, updatedAt: 0}}],
+          data: [{ $skip: (pageNumber - 1) * pageSize }, { $limit: pageSize },{$project: {priority: 0, updatedAt: 0,order: 0}}],
         },
       },
       {

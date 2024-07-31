@@ -23,7 +23,7 @@ class FactorService {
     this.#orderModel = OrderModel;
   }
 
-  async orderListForPharmacy(pharmacyId,pageNumber, pageSize) {
+  async orderListForPharmacy(pharmacyId, pageNumber, pageSize, search) {
     // const order = await this.#model
     //   .find(
     //     { pharmacyId },
@@ -44,44 +44,53 @@ class FactorService {
     //     }
     //   )
     //   .lean();
-      const [{ total, data }] = await this.#model.aggregate([
-        {
-          $match: { pharmacyId: new Types.ObjectId(pharmacyId) },
+    const [{ total, data }] = await this.#model.aggregate([
+      {
+        $match: {
+          pharmacyId: new Types.ObjectId(pharmacyId),
+          fullName: search,
         },
-        {
-          $facet: {
-            total: [{ $group: { _id: null, count: { $sum: 1 } } }],
-            data: [{ $skip: (pageNumber - 1) * pageSize }, { $limit: pageSize },{$project: {
-              accepted: 0,
-              uploadPrescription: 0,
-              otc: 0,
-              pharmacyId: 0,
-              elecPrescription: 0,
-              userId: 0,
-              addressId: 0,
-              updatedAt: 0,
-            }},{$sort: {_id: -1}}],
-          },
+      },
+      {
+        $facet: {
+          total: [{ $group: { _id: null, count: { $sum: 1 } } }],
+          data: [
+            { $skip: (pageNumber - 1) * pageSize },
+            { $limit: pageSize },
+            {
+              $project: {
+                accepted: 0,
+                uploadPrescription: 0,
+                otc: 0,
+                pharmacyId: 0,
+                elecPrescription: 0,
+                userId: 0,
+                addressId: 0,
+                updatedAt: 0,
+              },
+            },
+            { $sort: { _id: -1 } },
+          ],
         },
-        {
-          $project: {
-            total: "$total.count",
-            data: "$data",
-          },
+      },
+      {
+        $project: {
+          total: "$total.count",
+          data: "$data",
         },
-      ]);
-      if (!data) throw createHttpError.BadRequest();
-      return { total, data };
+      },
+    ]);
+    if (!data) throw createHttpError.BadRequest();
+    return { total, data };
   }
   async orderForPharmacy(pharmacyId, factorId) {
     const order = await this.#model
       .findOne(
         { _id: factorId, pharmacyId },
-        { updatedAt: 0, pharmacyId: 0, mobile: 0, addressId: 0 },
+        { updatedAt: 0, pharmacyId: 0, mobile: 0, addressId: 0 }
       )
       .lean();
-    if (!order && isFalse(order.accepted))
-      throw createHttpError.NotFound();
+    if (!order && isFalse(order.accepted)) throw createHttpError.NotFound();
     return order;
   }
   async createFactor(data) {
@@ -195,36 +204,48 @@ class FactorService {
     ]);
     return factor;
   }
-  async findNewOrder(pharmacyId,pageNumber, pageSize) {
+  async findNewOrder(pharmacyId, pageNumber, pageSize, search) {
     // const data = await PharmacyOrderModel.find(
     //   { pharmacyId },
     //   { priority: 0, updatedAt: 0 }
     // );
     const [{ total, data }] = await PharmacyOrderModel.aggregate([
       {
-        $match: { pharmacyId: new Types.ObjectId(pharmacyId) },
+        $match: { pharmacyId: new Types.ObjectId(pharmacyId)},
       },
-      {$lookup: {
-        from: "orders",
-        foreignField: "_id",
-        localField: "orderId",
-        as: "order"
-      }},
       {
-          $unwind: {
-              path: "$order",
-              preserveNullAndEmptyArrays: true
-          }
+        $lookup: {
+          from: "orders",
+          foreignField: "_id",
+          localField: "orderId",
+          as: "order",
+        },
+      },
+      {
+        $unwind: {
+          path: "$order",
+          preserveNullAndEmptyArrays: true,
+        },
       },
       {
         $addFields: {
-            deliveryType: "$order.deliveryType",
+          deliveryType: "$order.deliveryType",
+          fullName: "$order.fullName",
+        },
+      },
+      {
+        $match: {
+          fullName: search,
         }
       },
       {
         $facet: {
+          data: [
+            { $skip: (pageNumber - 1) * pageSize },
+            { $limit: pageSize },
+            { $project: { priority: 0, updatedAt: 0, order: 0 } },
+          ],
           total: [{ $group: { _id: null, count: { $sum: 1 } } }],
-          data: [{ $skip: (pageNumber - 1) * pageSize }, { $limit: pageSize },{$project: {priority: 0, updatedAt: 0,order: 0}}],
         },
       },
       {
@@ -250,7 +271,14 @@ class FactorService {
     if (!data) throw createHttpError.NotFound();
     return data;
   }
-  async findOrdersWithStatus(pharmacyId, status, deliveryType,pageNumber, pageSize) {
+  async findOrdersWithStatus(
+    pharmacyId,
+    status,
+    deliveryType,
+    pageNumber,
+    pageSize,
+    search
+  ) {
     // const order = await this.#model.find(
     //   { pharmacyId, status, deliveryType },
     //   {
@@ -271,23 +299,37 @@ class FactorService {
     // );
     const [{ total, data }] = await this.#model.aggregate([
       {
-        $match: { pharmacyId: new Types.ObjectId(pharmacyId),status, deliveryType },
+        $match: {
+          pharmacyId: new Types.ObjectId(pharmacyId),
+          status,
+          deliveryType,
+          fullName: search,
+        },
       },
       {
         $facet: {
           total: [{ $group: { _id: null, count: { $sum: 1 } } }],
-          data: [{ $skip: (pageNumber - 1) * pageSize }, { $limit: pageSize },{$project: {
-            accepted: 0,
-            uploadPrescription: 0,
-            otc: 0,
-            pharmacyId: 0,
-            elecPrescription: 0,
-            userId: 0,
-            addressId: 0,
-            updatedAt: 0,
-          }},{$sort: {
-            _id: -1
-          }}],
+          data: [
+            { $skip: (pageNumber - 1) * pageSize },
+            { $limit: pageSize },
+            {
+              $project: {
+                accepted: 0,
+                uploadPrescription: 0,
+                otc: 0,
+                pharmacyId: 0,
+                elecPrescription: 0,
+                userId: 0,
+                addressId: 0,
+                updatedAt: 0,
+              },
+            },
+            {
+              $sort: {
+                _id: -1,
+              },
+            },
+          ],
         },
       },
       {
@@ -300,7 +342,7 @@ class FactorService {
     if (!data) throw createHttpError.BadRequest();
     return { total, data };
   }
-  async findConfirmedOrders(pharmacyId, status,pageNumber, pageSize) {
+  async findConfirmedOrders(pharmacyId, status, pageNumber, pageSize, search) {
     // const order = await this.#model.find(
     //   { pharmacyId, status },
     //   {
@@ -321,23 +363,36 @@ class FactorService {
     // );
     const [{ total, data }] = await this.#model.aggregate([
       {
-        $match: { pharmacyId: new Types.ObjectId(pharmacyId),status },
+        $match: {
+          pharmacyId: new Types.ObjectId(pharmacyId),
+          status,
+          fullName: search,
+        },
       },
       {
         $facet: {
           total: [{ $group: { _id: null, count: { $sum: 1 } } }],
-          data: [{ $skip: (pageNumber - 1) * pageSize }, { $limit: pageSize },{$project: {
-            accepted: 0,
-            uploadPrescription: 0,
-            otc: 0,
-            pharmacyId: 0,
-            elecPrescription: 0,
-            userId: 0,
-            addressId: 0,
-            updatedAt: 0,
-          }},{$sort: {
-            _id: -1
-          }}],
+          data: [
+            { $skip: (pageNumber - 1) * pageSize },
+            { $limit: pageSize },
+            {
+              $project: {
+                accepted: 0,
+                uploadPrescription: 0,
+                otc: 0,
+                pharmacyId: 0,
+                elecPrescription: 0,
+                userId: 0,
+                addressId: 0,
+                updatedAt: 0,
+              },
+            },
+            {
+              $sort: {
+                _id: -1,
+              },
+            },
+          ],
         },
       },
       {

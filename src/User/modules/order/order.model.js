@@ -45,7 +45,7 @@ const OrderSchema = new Schema({
     pharmId : {type: Types.ObjectId, required: false,ref: "pharmacyUser"},
     addressId : {type: Types.ObjectId,ref: "address", required: true},
     description: {type: String, required: false},
-    status: {type: String, required: false,enum: ['SUCCESS','PENDING','FAILED','PAID','DELIVERED'],default: 'PENDING'},
+    status: {type: String, required: false,enum: ['SUCCESS','PENDING','FAILED','PAID','DELIVERED','SENT','WFP'],default: 'PENDING'},
     deliveryType: {type: String, required: false,enum: ['COURIER','PERSON'],default: 'COURIER'},
     otc: {type: [OTCSchema],required: false},
     uploadPrescription: {type: [UploadPrescriptionSchema],required: false},

@@ -85,6 +85,13 @@
  *                      type: number
  *                  drug:
  *                      type: string
+ *          Delivery:
+ *              type: object
+ *              required:
+ *                  -   factorId
+ *              properties:
+ *                  factorId:
+ *                      type: string
  *          Accept:
  *              type: object
  *              required:
@@ -139,6 +146,9 @@
  *          -   in: query
  *              name: perpage
  *              type: number
+ *          -   in: query
+ *              name: search
+ *              type: string
  *      responses:
  *          200:
  *              description: success
@@ -249,6 +259,9 @@
  *          -   in: query
  *              name: perpage
  *              type: number
+ *          -   in: query
+ *              name: search
+ *              type: string
  *      responses:
  *          200:
  *              description: success
@@ -349,6 +362,40 @@
  *              application/x-www-form-urlencoded:
  *                  schema:
  *                      $ref: "#/components/schemas/AcceptPrice"
+ *      responses:
+ *          200:
+ *              description: success
+ *      
+ */
+/**
+ * @swagger
+ * /pharmacy/factor/delivery/courier:
+ *  post:
+ *      summary: delivery to courier
+ *      tags:
+ *          -   Pharmacy-Factor
+ *      requestBody:
+ *          content:
+ *              application/x-www-form-urlencoded:
+ *                  schema:
+ *                      $ref: "#/components/schemas/Delivery"
+ *      responses:
+ *          200:
+ *              description: success
+ *      
+ */
+/**
+ * @swagger
+ * /pharmacy/factor/delivery/person:
+ *  post:
+ *      summary: delivery to courier
+ *      tags:
+ *          -   Pharmacy-Factor
+ *      requestBody:
+ *          content:
+ *              application/x-www-form-urlencoded:
+ *                  schema:
+ *                      $ref: "#/components/schemas/Delivery"
  *      responses:
  *          200:
  *              description: success

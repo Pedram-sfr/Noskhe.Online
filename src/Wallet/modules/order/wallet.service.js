@@ -48,10 +48,10 @@ class WalletService {
     return wallet;
   }
   async addWalletDetail(userId, data) {
-    console.log(data);
     const wallet = await this.findWalletByUserIdForProfile(userId);
+    console.log(wallet,data);
     let cash = 0;
-    if (isFalse(data.status)) cash = wallet.cash - data?.amount;
+    if (data.state === 'DECREMENT') cash = wallet.cash - data?.amount;
     else cash = wallet.cash + data?.amount;
     const res = await this.#model.updateOne(
       { userId },

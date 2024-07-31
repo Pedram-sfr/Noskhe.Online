@@ -139,12 +139,13 @@ class OrderService {
   async notAcceptOrderToPharmacy(id) {
     const pharm = await PharmacyOrderModel.findById(id);
     let result;
-    if (pharm.priority.length == 1)
+    if (pharm.priority.length == 1){
       result = await PharmacyOrderModel.updateOne(
         { _id: id },
         { pharmacyId: pharm.priority[0], priority: [], status: "PENDING" }
       );
-    else if (pharm.priority.length == 2)
+    }
+    else if (pharm.priority.length == 2){
       result = await PharmacyOrderModel.updateOne(
         { _id: id },
         {
@@ -153,7 +154,8 @@ class OrderService {
           status: "PENDING",
         }
       );
-    else if (pharm.priority.length == 3)
+    }
+    else if (pharm.priority.length == 3){
       result = await PharmacyOrderModel.updateOne(
         { _id: id },
         {
@@ -162,14 +164,15 @@ class OrderService {
           status: "PENDING",
         }
       );
+    }
     else if (pharm.priority.length == 0) {
       const order = await this.#model.findOne(pharm.orderId);
+      const res = await PharmacyOrderModel.deleteOne({ _id: pharm._id });
       order.status = "FAILED";
       order.save();
-      const res = await PharmacyOrderModel.deleteOne({ _id: pharm._id });
-      throw createHttpError.NotAcceptable("سفارش شما پذیرفته نشد");
+      return res;
     }
-    const user = await OrderModel.findById(orderId);
+    const user = await OrderModel.findById(pharm.orderId);
     const res = await botService.sendMessage(
       pharm.priority[0],
       user.fullName,

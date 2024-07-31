@@ -87,6 +87,30 @@ class WalletController{
             next(error)
         }
     }
+    async addDetail(req,res,next){
+        try {
+            const {userId} = req.pharmacyuser
+            const pharmDetail = {
+                RefNo: codeGen(),
+                amount: 250000,
+                paymentId: "66aa402cf1f0ebcf76be13af",
+                invoiceId: "66aa402cf1f0ebcf76be13af",
+                state: 'DECREMENT',
+                status: true,
+                description: `واریز مبلغ سفارش به شماره فاکتور 437496943745536 `
+            }
+            const pay = await this.#service.addWalletDetail(userId,pharmDetail)
+            return res.status(200).json({
+                statusCode: 200,
+                data: {
+                   pay
+                },
+                error: null
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
     
 
 }

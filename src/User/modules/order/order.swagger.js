@@ -219,7 +219,6 @@
  *          -   in: query
  *              name: perpage
  *              type: number
- *          -   in: query
  *      responses:
  *          200:
  *              description: success

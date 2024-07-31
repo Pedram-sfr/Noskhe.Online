@@ -85,7 +85,7 @@ const FactorSchema = new Schema(
     price: { type: Number, required: true, default: 0 },
     insurancePrice: { type: Number, required: true, default: 0 },
     totalPrice: { type: Number, required: true, default: 0 },
-    deliveryTime: { type: Number, required: true, default: 60 },
+    deliveryTime: { type: Date, required: true },
     deliveryType: {
       type: String,
       required: true,
@@ -103,8 +103,8 @@ const FactorSchema = new Schema(
     status: {
       type: String,
       required: true,
-      enum: ["SEND", "PENDING", "FAILED", "PAID", "DELIVERED","WFC"],
-      default: "PENDING",
+      enum: ["SENT", "PENDING", "FAILED", "PAID", "DELIVERED","WFC","WFP"],
+      default: "WFP",
     },
   },
   { timestamps: true, versionKey: 0 }

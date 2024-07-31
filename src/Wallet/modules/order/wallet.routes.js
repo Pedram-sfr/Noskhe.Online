@@ -1,5 +1,6 @@
-const Authorization = require("../../../common/guard/authorization.guard");
-const { } = require("multer")
+
+const AuthorizationPharmacy = require("../../../common/guard/authorizationPharmacy.guard");
+const walletController = require("./wallet.controller");
 
 const router = require("express").Router();
 

@@ -5,6 +5,7 @@ const {
   createPdf,
   codeGen,
   isFalse,
+  isTrue,
 } = require("../../../common/function/function");
 const OrderModel = require("../../../User/modules/order/order.model");
 const {
@@ -294,16 +295,24 @@ class FactorController {
       const pageNumber = parseInt(req.query.page || 1); // Get the current page number from the query parameters
       const pageSize = parseInt(req.query.perpage || 10);
       const list = req.query.list;
+      const sch = req.query.search;
+      const search = new RegExp(sch, "ig");
       let data;
       if (list == "ALL") {
-        data = (await this.#service.orderListForPharmacy(userId,pageNumber, pageSize));
+        data = await this.#service.orderListForPharmacy(
+          userId,
+          pageNumber,
+          pageSize,
+          search
+        );
       } else if (list == "PERSON") {
         data = await this.#service.findOrdersWithStatus(
           userId,
           "PAID",
           "PERSON",
           pageNumber,
-          pageSize
+          pageSize,
+          search
         );
       } else if (list == "COURIER") {
         data = await this.#service.findOrdersWithStatus(
@@ -311,7 +320,8 @@ class FactorController {
           "PAID",
           "COURIER",
           pageNumber,
-          pageSize
+          pageSize,
+          search
         );
       } else if (list == "WFC") {
         data = await this.#service.findOrdersWithStatus(
@@ -319,12 +329,19 @@ class FactorController {
           "WFC",
           "COURIER",
           pageNumber,
-          pageSize
+          pageSize,
+          search
         );
       } else if (list == "CONFIRMED") {
-        data = await this.#service.findConfirmedOrders(userId, "PENDING",pageNumber, pageSize);
+        data = await this.#service.findConfirmedOrders(
+          userId,
+          "WFP",
+          pageNumber,
+          pageSize,
+          search
+        );
       } else throw createHttpError.BadRequest("NotFountQuery");
-      const result = pagination(data.data, pageNumber, pageSize,data.total[0]);
+      const result = pagination(data.data, pageNumber, pageSize, data.total[0]);
       return res.status(200).json({
         statusCode: 200,
         list,
@@ -453,6 +470,7 @@ class FactorController {
       const { userId } = req.pharmacyuser;
       const { orderId, deliveryTime, deliveryType } = req.body;
       let data = {};
+      const nowDate = new Date().getTime();
       const po = await PharmacyOrderModel.findOne({
         orderId,
         pharmacyId: userId,
@@ -462,7 +480,7 @@ class FactorController {
       if (!order) throw createHttpError.BadRequest();
       order.pharmId = userId;
       order.accepted = true;
-      order.status = "SUCCESS";
+      order.status = "WFP";
       order.save();
       await PharmacyOrderModel.deleteOne({ _id: po._id });
       if (deliveryType == "PERSON") {
@@ -473,7 +491,7 @@ class FactorController {
           orderId: order._id,
           addressId: order.addressId,
           fullName: order.fullName,
-          deliveryTime,
+          deliveryTime: new Date(nowDate + deliveryTime * 60000),
           deliveryType: "PERSON",
         };
       } else if (deliveryType == "COURIER") {
@@ -485,6 +503,7 @@ class FactorController {
           addressId: order.addressId,
           shippingCost: 20000,
           fullName: order.fullName,
+          deliveryTime: new Date(nowDate + 60 * 60000),
         };
       }
       const { _id: factorId } = await this.#service.createFactor(data);
@@ -504,8 +523,15 @@ class FactorController {
       const { userId } = req.pharmacyuser;
       const pageNumber = parseInt(req.query.page || 1); // Get the current page number from the query parameters
       const pageSize = parseInt(req.query.perpage || 10);
-      const {data,total} = await this.#service.findNewOrder(userId,pageNumber, pageSize);
-      const result = pagination(data, pageNumber, pageSize,total[0]);
+      const sch = req.query.search;
+      const search = new RegExp(sch, "ig");
+      const { data, total } = await this.#service.findNewOrder(
+        userId,
+        pageNumber,
+        pageSize,
+        search
+      );
+      const result = pagination(data, pageNumber, pageSize, total[0]);
       return res.status(200).json({
         statusCode: 200,
         result,
@@ -545,12 +571,75 @@ class FactorController {
       next(error);
     }
   }
+  async deliveryToCourier(req, res, next) {
+    try {
+      const { userId } = req.pharmacyuser;
+      const { factorId } = req.body;
+      const invoice = await FactorModel.findOne({
+        _id: factorId,
+        pharmacyId: userId,
+      });
+      const order = await OrderModel.findOne({
+        _id: invoice.orderId,
+        userId: invoice.userId,
+      });
+      if (invoice.deliveryType == "COURIER" && isTrue(invoice.paymentStatus)) {
+        invoice.status = "SENT";
+        order.status = "SENT";
+        invoice.save();
+        order.save();
+      } else throw createHttpError.BadRequest();
+      return res.status(200).json({
+        statusCode: 200,
+        data: {
+          message: "ok",
+        },
+        error: null,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+  async deliveryToPerson(req, res, next) {
+    try {
+      const { userId } = req.pharmacyuser;
+      const { factorId } = req.body;
+      const invoice = await FactorModel.findOne({
+        _id: factorId,
+        pharmacyId: userId,
+      });
+      const order = await OrderModel.findOne({
+        _id: invoice.orderId,
+        userId: invoice.userId,
+      });
+      if (invoice.deliveryType == "PERSON" && isTrue(invoice.paymentStatus)) {
+        invoice.status = "DELIVERED";
+        order.status = "DELIVERED";
+        invoice.save();
+        order.save();
+      } else throw createHttpError.BadRequest();
+      return res.status(200).json({
+        statusCode: 200,
+        data: {
+          message: "ok",
+        },
+        error: null,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
   async acceptPrice(req, res, next) {
     try {
       const { userId } = req.pharmacyuser;
       const { invoiceId } = req.body;
-      const invoice = await FactorModel.findOne({_id: invoiceId, pharmacyId: userId});
-      let price= 0 ,totalPrice = 0, insurance = 0;
+      const invoice = await FactorModel.findOne({
+        _id: invoiceId,
+        pharmacyId: userId,
+      });
+      let price = 0,
+        totalPrice = 0,
+        insurance = 0;
       const otc = invoice.otc;
       const upload = invoice.uploadPrescription;
       const elec = invoice.elecPrescription;
@@ -559,21 +648,25 @@ class FactorController {
           price += parseInt(otc[i].price);
           totalPrice += parseInt(otc[i].total);
         }
-      } 
+      }
       if (upload.length > 0) {
         for (let i = 0; i < upload.length; i++) {
           price += parseInt(upload[i].price);
           insurance += parseInt(upload[i].insurance);
-          totalPrice = totalPrice + (parseInt(upload[i].price) - parseInt(upload[i].insurance));
+          totalPrice =
+            totalPrice +
+            (parseInt(upload[i].price) - parseInt(upload[i].insurance));
         }
-      } 
+      }
       if (elec.length > 0) {
         for (let i = 0; i < elec.length; i++) {
           price += parseInt(elec[i].price);
           insurance += parseInt(elec[i].insurance);
-          totalPrice = totalPrice + (parseInt(elec[i].price) - parseInt(elec[i].insurance));
+          totalPrice =
+            totalPrice +
+            (parseInt(elec[i].price) - parseInt(elec[i].insurance));
         }
-      } 
+      }
       invoice.price = price;
       invoice.insurancePrice = insurance;
       invoice.totalPrice = totalPrice;
@@ -639,15 +732,12 @@ class FactorController {
           );
         }
         if (data.modifiedCount == 0)
-          throw createHttpError.InternalServerError(
-            "Nok"
-          );
+          throw createHttpError.InternalServerError("Nok");
         invoice.price = parseInt(invoice.price) + parseInt(price);
         invoice.totalPrice = parseInt(invoice.totalPrice) + parseInt(price);
-        console.log("1 --> ",invoice.price,invoice.totalPrice );
+        console.log("1 --> ", invoice.price, invoice.totalPrice);
         invoice.save();
-      } 
-      else if (itemType == "UPLOAD") {
+      } else if (itemType == "UPLOAD") {
         const { uploadPrescription: upload } = await OrderModel.findOne(
           {
             _id: new mongoose.Types.ObjectId(invoice.orderId),
@@ -664,28 +754,33 @@ class FactorController {
           },
           {
             $push: {
-              uploadPrescription:{
+              uploadPrescription: {
                 image: upload[0].image,
                 price,
                 insurance: insurance,
                 patient: price - insurance,
                 total: price - insurance,
-              }
+              },
             },
           }
         );
         if (data.modifiedCount == 0)
-          throw createHttpError.InternalServerError(
-            "Nok"
-          );
-          console.log(price,insurance,data);
+          throw createHttpError.InternalServerError("Nok");
+        console.log(price, insurance, data);
         invoice.price = parseInt(invoice.price) + parseInt(price);
-        invoice.insurancePrice = parseInt(invoice.insurancePrice) + parseInt(insurance || 0);
-        invoice.totalPrice = parseInt(invoice.totalPrice) + (parseInt(price) - parseInt(insurance || 0));
-        console.log("2 --> ",invoice.price,invoice.insurancePrice,invoice.totalPrice );
+        invoice.insurancePrice =
+          parseInt(invoice.insurancePrice) + parseInt(insurance || 0);
+        invoice.totalPrice =
+          parseInt(invoice.totalPrice) +
+          (parseInt(price) - parseInt(insurance || 0));
+        console.log(
+          "2 --> ",
+          invoice.price,
+          invoice.insurancePrice,
+          invoice.totalPrice
+        );
         invoice.save();
-      } 
-      else if (itemType == "ELEC") {
+      } else if (itemType == "ELEC") {
         const { elecPrescription: elec } = await OrderModel.findOne(
           {
             _id: new mongoose.Types.ObjectId(invoice.orderId),
@@ -702,7 +797,7 @@ class FactorController {
           },
           {
             $push: {
-              elecPrescription:{
+              elecPrescription: {
                 typeOfInsurance: elec[0].typeOfInsurance,
                 nationalCode: elec[0].nationalCode,
                 doctorName: elec[0].doctorName,
@@ -711,25 +806,27 @@ class FactorController {
                 insurance: insurance,
                 patient: price - insurance,
                 total: price - insurance,
-              }
+              },
             },
           }
         );
         if (data.modifiedCount == 0)
-          throw createHttpError.InternalServerError(
-            "Nok"
-          );
+          throw createHttpError.InternalServerError("Nok");
         invoice.price = parseInt(invoice.price) + parseInt(price);
-        invoice.insurancePrice = parseInt(invoice.insurancePrice) + parseInt(insurance);
-        invoice.totalPrice = parseInt(invoice.totalPrice) + parseInt(price) - parseInt(insurance);
-        console.log("3 --> ",invoice.price,invoice.insurancePrice,invoice.totalPrice );
-        invoice.save();
-      }
-      else throw new createHttpError.BadRequest()
-      if (data.modifiedCount == 0)
-        throw createHttpError.InternalServerError(
-          "Nok"
+        invoice.insurancePrice =
+          parseInt(invoice.insurancePrice) + parseInt(insurance);
+        invoice.totalPrice =
+          parseInt(invoice.totalPrice) + parseInt(price) - parseInt(insurance);
+        console.log(
+          "3 --> ",
+          invoice.price,
+          invoice.insurancePrice,
+          invoice.totalPrice
         );
+        invoice.save();
+      } else throw new createHttpError.BadRequest();
+      if (data.modifiedCount == 0)
+        throw createHttpError.InternalServerError("Nok");
       return res.status(200).json({
         statusCode: 200,
         data: {

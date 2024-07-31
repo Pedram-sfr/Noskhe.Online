@@ -33,9 +33,11 @@ class OrderController {
       const address = await AddressModel.findOne({ _id: addressId, userId });
       if (!address) throw createHttpError.NotFound("آدرس یافت نشد");
       const data = await this.#service.findPharmacyAroundUser(
-        address.coordinate,pageNumber,pageSize
+        address.coordinate,
+        pageNumber,
+        pageSize
       );
-      const result = pagination(data.data, pageNumber, pageSize,data.total[0]);
+      const result = pagination(data.data, pageNumber, pageSize, data.total[0]);
       return res.status(200).json({
         statusCode: 200,
         result,
@@ -63,7 +65,11 @@ class OrderController {
         fullName: user.fullName,
         deliveryType: "PERSON",
       });
-      await this.#service.addOrderToPerson(pharmacyId, result._id,result.refId);
+      await this.#service.addOrderToPerson(
+        pharmacyId,
+        result._id,
+        result.refId
+      );
       return res.status(200).json({
         statusCode: 200,
         data: {
@@ -80,7 +86,29 @@ class OrderController {
       const { userId } = req.user;
       const { orderId } = req.params;
       const delivery = {};
+      const payment = {};
       const data = {};
+      const status = ["SENT", "PAID", "DELIVERED","WFC"]
+      const d = await FactorModel.findOne(
+        { userId, orderId },
+        {
+          orderId: 0,
+          _id: 0,
+          userId: 0,
+          updatedAt: 0,
+          addressId: 0,
+          pharmacyId: 0,
+          deliveryType: 0,
+          paymentStatus: 0,
+          sendStatus: 0,
+          active: 0,
+          paymentCode: 0,
+        }
+      );
+      payment.price = d.price;
+      payment.insurancePrice = d.insurancePrice
+      payment.totalPrice = d.totalPrice
+      payment.serviceFee = 50000
       const order = await OrderModel.findOne(
         { userId, _id: orderId },
         { deliveryType: 1, status: 1, addressId: 1 }
@@ -92,57 +120,45 @@ class OrderController {
         { userId, orderId },
         { orderId: 0, _id: 0, userId: 0, updatedAt: 0 }
       );
-      const now = new Date().getTime();
-      if (factor.status == "PENDING") {
+      if (factor.status == "WFP") {
         if (factor.deliveryType == "PERSON") {
           const address = await PharmacyUserModel.findById(factor.pharmacyId, {
             address: 1,
           });
-          delivery.deliverTime = new Date(now + factor.deliveryTime * 60000);
-          delivery.deleverTo = address.address;
-          delivery.deleveryType = factor.deliveryType;
+          payment.shippingCost = d.shippingCost;
+          delivery.deliveryTime = d.deliveryTime;
+          delivery.deliveryTo = address.address;
+          delivery.deliveryType = factor.deliveryType;
+          payment.trackingCode = null;
+          payment.amount = null;
+          payment.createdAt = null;
         } else if (factor.deliveryType == "COURIER") {
           const del = await AddressModel.findById(factor.addressId, {
             address: 1,
           });
-          delivery["deliverTime"] = new Date(now + 60 * 60000);
+          payment.shippingCost = d.shippingCost;
+          delivery["deliverTime"] = d.deliverTime;
           delivery["deleverTo"] = del.address;
-          delivery.deleveryType = factor.deliveryType;
+          delivery.deliveryType = factor.deliveryType;
+          payment.trackingCode = null;
+          payment.amount = null;
+          payment.createdAt = null;
         }
-        data.delivery = delivery;
-        data.payment = {};
-      } else if (factor.status == "PAID") {
-        const payment = {};
+      } else if (status.includes(factor.status)) {
         const pay = await PaymentModel.findOne({ _id: factor.paymentCode });
         payment.trackingCode = pay.trackingCode;
         payment.amount = pay.amount;
+        payment.shippingCost = d.shippingCost;
         payment.createdAt = pay.createdAt;
         delivery.deliveryTo = pay.deliveryTo;
         delivery.deliveryType = pay.deliveryType;
         delivery.deliveryTime = pay.deliveryTime;
         delivery.deliveryDate = pay.deliveryDate;
         delivery.deliveryCode = pay.deliveryCode;
-        data.payment = payment;
-        data.delivery = delivery;
       }
-      const d = await FactorModel.findOne(
-        { userId, orderId },
-        {
-          orderId: 0,
-          _id: 0,
-          userId: 0,
-          updatedAt: 0,
-          addressId: 0,
-          pharmacyId: 0,
-          deliveryTime: 0,
-          deliveryType: 0,
-          paymentStatus: 0,
-          sendStatus: 0,
-          active: 0,
-          paymentCode: 0,
-        }
-      );
-
+      else throw createHttpError.NotFound()
+      data.payment = payment;
+      data.delivery = delivery;
       data.detail = d;
       return res.status(200).json({
         statusCode: 200,
@@ -198,18 +214,27 @@ class OrderController {
         {
           $facet: {
             total: [{ $group: { _id: null, count: { $sum: 1 } } }],
-            data: [{ $skip: (pageNumber - 1) * pageSize }, { $limit: pageSize },{$project: {
-              updatedAt: 0,
-              otc: 0,
-              uploadPrescription: 0,
-              elecPrescription: 0,
-              pharmId: 0,
-              addressId: 0,
-              mobile: 0,
-              fullName: 0,
-            }},{$sort: {
-              _id: -1
-            }}],
+            data: [
+              { $skip: (pageNumber - 1) * pageSize },
+              { $limit: pageSize },
+              {
+                $project: {
+                  updatedAt: 0,
+                  otc: 0,
+                  uploadPrescription: 0,
+                  elecPrescription: 0,
+                  pharmId: 0,
+                  addressId: 0,
+                  mobile: 0,
+                  fullName: 0,
+                },
+              },
+              {
+                $sort: {
+                  _id: -1,
+                },
+              },
+            ],
           },
         },
         {
@@ -220,7 +245,7 @@ class OrderController {
         },
       ]);
       if (!data) throw createHttpError.NotFound("بافت نشد");
-      const result = pagination(data, pageNumber, pageSize,total[0]);
+      const result = pagination(data, pageNumber, pageSize, total[0]);
       return res.status(200).json({
         statusCode: 200,
         result,
@@ -240,9 +265,12 @@ class OrderController {
       if (order.deliveryType == "COURIER") {
         address = await AddressModel.findById(order.addressId);
       } else if (order.deliveryType == "PERSON") {
-        const { pharmacyId } = await PharmacyOrderModel.findOne({orderId: order._id}, {
-          pharmacyId: 1,
-        });
+        const { pharmacyId } = await PharmacyOrderModel.findOne(
+          { orderId: order._id },
+          {
+            pharmacyId: 1,
+          }
+        );
         const { address } = await PharmacyUserModel.findById(pharmacyId);
         order["address"] = address;
       }
@@ -275,7 +303,11 @@ class OrderController {
         addressId,
         fullName: user.fullName,
       });
-      await this.#service.addOrderToPharmacy(address.coordinate, result._id,result.refId);
+      await this.#service.addOrderToPharmacy(
+        address.coordinate,
+        result._id,
+        result.refId
+      );
       return res.status(200).json({
         statusCode: 200,
         data: {
@@ -391,15 +423,16 @@ class OrderController {
   }
   async notAcceptOrder(req, res, next) {
     try {
-      const { id } = req.params;
+      const { orderId } = req.params;
       const { userId } = req.pharmacyuser;
-      console.log(id);
+      console.log(orderId);
       const otpd = await PharmacyOrderModel.findOne({
-        orderId: id,
+        orderId,
         pharmacyId: userId,
       });
       if (!otpd) throw createHttpError.NotFound("سفارش یافت نشد");
-      await this.#service.notAcceptOrderToPharmacy(otpd._id);
+      const result = await this.#service.notAcceptOrderToPharmacy(otpd._id);
+      if (result.modifiedCount == 0) throw createHttpError.BadRequest();
       return res.status(200).json({
         statusCode: 200,
         data: {

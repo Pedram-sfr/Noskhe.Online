@@ -3,10 +3,10 @@ const { Schema, model, Types } = require("mongoose");
 const DetailSchema = new Schema({
     RefNo: {type: Number,required: true,unique: true},
     amount: {type: Number,required: true},
-    paymentId: {type: Types.ObjectId, ref: "user",required: false},
-    invoiceId: {type: String,required: false},
+    paymentId: {type: Types.ObjectId, ref: "payment",required: true},
+    invoiceId: {type: Types.ObjectId, ref: "factor",required: true},
+    state: {type: String,enum: ['INCREMENT','DECREMENT','BUY'],required: true},
     description: {type: String,required: true},
-    state: {type: String,required: true},
     status: {type: Boolean,required: true},
 },{
     versionKey: false,
